@@ -6,7 +6,7 @@
 //
 
 #import "ViewController.h"
-#import <AppKit/AppKit.h>
+// #if TARGET_OS_MACCATALYST
 @implementation List
 + (BOOL)supportsSecureCoding {
     return YES;
@@ -46,10 +46,27 @@
     NSString *filePath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl2".stringByStandardizingPath;
     BOOL isExist = [fileManager fileExistsAtPath:filePath];
     if (!isExist) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"file Not Exists" message:nil preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+
+            }]];
+            [self presentViewController:alert animated:YES completion:nil];
+        });
         return;
     }
     NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
     NSData *data = [[NSData alloc] initWithContentsOfURL:fileUrl options:(NSDataReadingMappedIfSafe) error:&err];
+    if (err) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:err.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+
+            }]];
+            [self presentViewController:alert animated:YES completion:nil];
+        });
+        return;
+    }
     // NSDictionary *archver = [NSKeyedUnarchiver unarchivedObjectOfClass:NSDictionary.class fromData:data error:&err];
     NSDictionary *recentListInfo = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     NSArray *recentList = recentListInfo[@"items"];
