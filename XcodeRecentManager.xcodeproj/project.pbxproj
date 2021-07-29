@@ -411,17 +411,15 @@
 				CODE_SIGN_ENTITLEMENTS = XcodeRecentManager/XcodeRecentManager.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = KB7B8SQENU;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
 				INFOPLIST_FILE = XcodeRecentManager/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_CFLAGS = "-Wno-deprecated-declarations";
+				OTHER_CFLAGS = (
+					"-Wno-deprecated-declarations",
+					"-Wno-arc-performSelector-leaks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Demo.XcodeRecentManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
@@ -437,17 +435,15 @@
 				CODE_SIGN_ENTITLEMENTS = XcodeRecentManager/XcodeRecentManager.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = KB7B8SQENU;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
 				INFOPLIST_FILE = XcodeRecentManager/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_CFLAGS = "-Wno-deprecated-declarations";
+				OTHER_CFLAGS = (
+					"-Wno-deprecated-declarations",
+					"-Wno-arc-performSelector-leaks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Demo.XcodeRecentManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
