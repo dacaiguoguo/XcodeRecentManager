@@ -148,8 +148,10 @@
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
     }
     NSURL *aUrl = self.recentListArray[indexPath.row];
-    cell.textLabel.text = aUrl.path;
-    cell.detailTextLabel.text = self.branchInfo[aUrl.path];
+    NSString *path = aUrl.path;
+    cell.textLabel.text = path;
+    NSString *branchName = self.branchInfo[aUrl.path];
+    cell.detailTextLabel.text = branchName;
     return cell;
 }
 
