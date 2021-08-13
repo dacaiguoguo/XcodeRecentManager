@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@atom/plist": "github:atom/node-plist",
+    "objc": "^0.20.0"
+  }
+}
