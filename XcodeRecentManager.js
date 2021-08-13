@@ -8,13 +8,14 @@ const {
   NSURL,
   NSArray,
   NSString,
+  NSError,
   NSDictionary,
   NSDateFormatter,
   NSKeyedUnarchiver 
 } = objc;
 
-// var path = NSString.stringWithString("/Users/boot/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl2");
-var path = NSString.stringWithString("/Users/boot/Downloads/com.apple.dt.xcode.sfl2");
+var path = NSString.stringWithString("/Users/boot/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl2");
+// var path = NSString.stringWithString("/Users/boot/Downloads/com.apple.dt.xcode.sfl2");
 // 
 // var pathFull = path.stringByStandardizingPath();
 console.log(path)
