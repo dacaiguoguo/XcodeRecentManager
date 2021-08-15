@@ -35,7 +35,7 @@ for (var i = recentList.count() - 1; i >= 0; i--) {
     var bookmarkData = firstObj.objectForKey("Bookmark")
     //+ (nullable instancetype)URLByResolvingBookmarkData:(NSData *)bookmarkData options:(NSURLBookmarkResolutionOptions)options relativeToURL:(nullable NSURL *)relativeURL bookmarkDataIsStale:(BOOL * _Nullable)isStale error:(NSError **)error API_AVAILABLE(macos(10.6), ios(4.0), watchos(2.0), tvos(9.0));
     var receurl = NSURL.URLByResolvingBookmarkData_options_relativeToURL_bookmarkDataIsStale_error(bookmarkData, 1 << 8, null, null, null)
-    console.log(receurl)
+    console.log(String(receurl))
 }
 
 // var obj = plist.parseFileSync();
