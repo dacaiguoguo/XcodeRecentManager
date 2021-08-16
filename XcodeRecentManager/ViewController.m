@@ -7,20 +7,7 @@
 
 #import "ViewController.h"
 // #if TARGET_OS_MACCATALYST
-@implementation List
-+ (BOOL)supportsSecureCoding {
-    return YES;
-}
-- (void)encodeWithCoder:(nonnull NSCoder *)coder {
 
-}
-
-- (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
-    self = [super init];
-    return self;
-}
-
-@end
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (nonatomic, copy) NSArray *recentListArray;
 @property (nonatomic, copy) NSDictionary *branchInfo;
@@ -31,18 +18,25 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self loadData];
+    self.title = @"最近文件列表";
     [self.view addSubview:self.tableView];
+    [self loadData];
 
-//    [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationWillEnterForegroundNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-//        [self loadData];
-//        [self.tableView reloadData];
-//    }];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setImage:[UIImage systemImageNamed:@"arrow.clockwise.circle"] forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(refreshAction:) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    self.navigationItem.rightBarButtonItem = barButton;
+}
+
+- (void)refreshAction:(id)sender {
+    [self loadData];
+    [self.tableView reloadData];
 }
 
 - (void)loadData {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *err = nil;
+
     NSString *filePath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl2".stringByStandardizingPath;
     BOOL isExist = [fileManager fileExistsAtPath:filePath];
     if (!isExist) {
@@ -56,10 +50,11 @@
         return;
     }
     NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
+    NSError *err = nil;
     NSData *data = [[NSData alloc] initWithContentsOfURL:fileUrl options:(NSDataReadingMappedIfSafe) error:&err];
-    if (err) {
+    if (err && data) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:err.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:(err.localizedDescription?:@"no data") preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
 
             }]];
@@ -67,21 +62,19 @@
         });
         return;
     }
-    // NSDictionary *archver = [NSKeyedUnarchiver unarchivedObjectOfClass:NSDictionary.class fromData:data error:&err];
     NSDictionary *recentListInfo = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     NSArray *recentList = recentListInfo[@"items"];
 
     NSMutableArray *mutArray = [NSMutableArray array];
     [recentList enumerateObjectsUsingBlock:^(NSDictionary *bookmarkInfo, NSUInteger idx, BOOL * _Nonnull stop) {
         NSData *bookmark = bookmarkInfo[@"Bookmark"];
-        CFErrorRef *errorRef = NULL;
-        CFURLRef resolvedUrl = CFURLCreateByResolvingBookmarkData (NULL, CFBridgingRetain(bookmark), kCFBookmarkResolutionWithoutUIMask, NULL, NULL, false, errorRef);
-        if (resolvedUrl == NULL) {
+        NSError *resolveError = nil;
+        NSURL *resolvedUrl = [NSURL URLByResolvingBookmarkData:bookmark options:(NSURLBookmarkResolutionWithoutUI) relativeToURL:nil bookmarkDataIsStale:nil error:&resolveError];
+        if (resolvedUrl == nil) {
             NSLog(@"%@",@"null");
         } else {
-            NSLog(@"%@",resolvedUrl);
-            NSURL *aUrl = CFBridgingRelease(resolvedUrl);
-            [mutArray addObject:aUrl];
+            NSLog(@"%@",resolvedUrl.path);
+            [mutArray addObject:resolvedUrl];
         }
     }];
     self.recentListArray = mutArray;
@@ -95,8 +88,7 @@
         // Load the principal class from the bundle
         // This is set in MacTask/Info.plist
         Class principalClass = bundle.principalClass;
-
-        NSURL *workingDir = [NSFileManager defaultManager].temporaryDirectory;            // [@"testing" writeToFile:[workingDir URLByAppendingPathComponent:@"test.txt"].path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        NSURL *workingDir = [NSFileManager defaultManager].temporaryDirectory;
         NSMutableDictionary *branchInfo = [NSMutableDictionary dictionary];
         //#endif
         [mutArray enumerateObjectsUsingBlock:^(NSURL *obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -104,14 +96,15 @@
             NSString *workPath = aUrl.path.stringByDeletingLastPathComponent;
             SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
             NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
-            NSString *code = result[@"code"];
-            NSString *output = result[@"output"];
-
-            NSArray *resultArray = [output componentsSeparatedByString:@"\n"];
-            for (NSString *item in resultArray) {
-                if ([item hasPrefix:@"*"]) {
-                    NSLog(@"%@ %@", code, item);
-                    branchInfo[obj.path] = item;
+            NSNumber *code = result[@"code"];
+            if (code.intValue == 0) { /// code == 0 命令执行成功
+                NSString *output = result[@"output"];
+                NSArray *resultArray = [output componentsSeparatedByString:@"\n"];
+                for (NSString *item in resultArray) {
+                    if ([item hasPrefix:@"*"]) {
+                        NSLog(@"%@ %@", code, item);
+                        branchInfo[obj.path] = item;
+                    }
                 }
             }
         }];

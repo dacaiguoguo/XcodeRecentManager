@@ -8,7 +8,7 @@
 #import "LVTask.h"
 #import <AppKit/AppKit.h>
 @implementation LVTask {
-//    NSTask *task;
+
 }
 - (instancetype)init {
     self = [super init];
