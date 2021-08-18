@@ -52,7 +52,7 @@
     NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
     NSError *err = nil;
     NSData *data = [[NSData alloc] initWithContentsOfURL:fileUrl options:(NSDataReadingMappedIfSafe) error:&err];
-    if (err && data) {
+    if (err || data==nil) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:(err.localizedDescription?:@"no data") preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -62,7 +62,7 @@
         });
         return;
     }
-    NSDictionary *recentListInfo = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    NSDictionary *recentListInfo = [NSKeyedUnarchiver unarchiveTopLevelObjectWithData:data error:&err];
     NSArray *recentList = recentListInfo[@"items"];
 
     NSMutableArray *mutArray = [NSMutableArray array];
@@ -138,10 +138,12 @@
     static NSString *identifier = @"identifier";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (!cell) {
-        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
     }
     NSURL *aUrl = self.recentListArray[indexPath.row];
     NSString *path = aUrl.path;
+    NSString *homePath = NSHomeDirectory();
+    path = [path stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
     cell.textLabel.text = path;
     NSString *branchName = self.branchInfo[aUrl.path];
     cell.detailTextLabel.text = branchName;
