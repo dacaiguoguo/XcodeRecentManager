@@ -14,6 +14,7 @@
 		9D0A61F326B143BB0069D967 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D0A61F226B143BB0069D967 /* Assets.xcassets */; };
 		9D0A61F626B143BB0069D967 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0A61F426B143BB0069D967 /* LaunchScreen.storyboard */; };
 		9D0A61F926B143BB0069D967 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61F826B143BB0069D967 /* main.m */; };
+		9D15C89E26CCABDC003154B6 /* SFLListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D15C89C26CCABDC003154B6 /* SFLListItem.m */; };
 		9D7F18C326B1880900F3A4B1 /* MacTask.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = 9D7F18BC26B187F600F3A4B1 /* MacTask.bundle */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9D7F18C926B1886300F3A4B1 /* LVTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F18C826B1886300F3A4B1 /* LVTask.m */; };
 /* End PBXBuildFile section */
@@ -66,6 +67,8 @@
 		9D0A61F726B143BB0069D967 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D0A61F826B143BB0069D967 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9D0A61FF26B143C00069D967 /* XcodeRecentManager.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XcodeRecentManager.entitlements; sourceTree = "<group>"; };
+		9D15C89C26CCABDC003154B6 /* SFLListItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SFLListItem.m; path = ReadApplicationRecentDocuments/ReadApplicationRecentDocuments/SFLListItem.m; sourceTree = SOURCE_ROOT; };
+		9D15C89D26CCABDC003154B6 /* SFLListItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SFLListItem.h; path = ReadApplicationRecentDocuments/ReadApplicationRecentDocuments/SFLListItem.h; sourceTree = SOURCE_ROOT; };
 		9D7F18BC26B187F600F3A4B1 /* MacTask.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MacTask.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D7F18BE26B187F600F3A4B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D7F18C726B1886300F3A4B1 /* LVTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LVTask.h; sourceTree = "<group>"; };
@@ -119,6 +122,8 @@
 				9D0A61EA26B143B80069D967 /* SceneDelegate.m */,
 				9D0A61EC26B143B80069D967 /* ViewController.h */,
 				9D0A61ED26B143B80069D967 /* ViewController.m */,
+				9D15C89D26CCABDC003154B6 /* SFLListItem.h */,
+				9D15C89C26CCABDC003154B6 /* SFLListItem.m */,
 				9D0A61EF26B143B80069D967 /* Main.storyboard */,
 				9D0A61F226B143BB0069D967 /* Assets.xcassets */,
 				9D0A61F426B143BB0069D967 /* LaunchScreen.storyboard */,
@@ -248,6 +253,7 @@
 				9D0A61EE26B143B80069D967 /* ViewController.m in Sources */,
 				9D0A61E826B143B80069D967 /* AppDelegate.m in Sources */,
 				9D0A61F926B143BB0069D967 /* main.m in Sources */,
+				9D15C89E26CCABDC003154B6 /* SFLListItem.m in Sources */,
 				9D0A61EB26B143B80069D967 /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

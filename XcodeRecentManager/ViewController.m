@@ -6,6 +6,8 @@
 //
 
 #import "ViewController.h"
+#import "SFLListItem.h"
+
 // #if TARGET_OS_MACCATALYST
 
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
@@ -62,22 +64,8 @@
         });
         return;
     }
-    NSDictionary *recentListInfo = [NSKeyedUnarchiver unarchiveTopLevelObjectWithData:data error:&err];
-    NSArray *recentList = recentListInfo[@"items"];
 
-    NSMutableArray *mutArray = [NSMutableArray array];
-    [recentList enumerateObjectsUsingBlock:^(NSDictionary *bookmarkInfo, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSData *bookmark = bookmarkInfo[@"Bookmark"];
-        NSError *resolveError = nil;
-        NSURL *resolvedUrl = [NSURL URLByResolvingBookmarkData:bookmark options:(NSURLBookmarkResolutionWithoutUI) relativeToURL:nil bookmarkDataIsStale:nil error:&resolveError];
-        if (resolvedUrl == nil) {
-            NSLog(@"%@",@"null");
-        } else {
-            NSLog(@"%@",resolvedUrl.path);
-            [mutArray addObject:resolvedUrl];
-        }
-    }];
-    self.recentListArray = mutArray;
+    self.recentListArray = readSflWithFile(filePath);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         //#if TARGET_OS_MACCATALYST
@@ -91,9 +79,8 @@
         NSURL *workingDir = [NSFileManager defaultManager].temporaryDirectory;
         NSMutableDictionary *branchInfo = [NSMutableDictionary dictionary];
         //#endif
-        [mutArray enumerateObjectsUsingBlock:^(NSURL *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSURL *aUrl = obj;
-            NSString *workPath = aUrl.path.stringByDeletingLastPathComponent;
+        [self->_recentListArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSString *workPath = obj.stringByDeletingLastPathComponent;
             SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
             NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
             NSNumber *code = result[@"code"];
@@ -103,7 +90,7 @@
                 for (NSString *item in resultArray) {
                     if ([item hasPrefix:@"*"]) {
                         NSLog(@"%@ %@", code, item);
-                        branchInfo[obj.path] = item;
+                        branchInfo[obj] = item;
                     }
                 }
             }
@@ -140,12 +127,11 @@
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
     }
-    NSURL *aUrl = self.recentListArray[indexPath.row];
-    NSString *path = aUrl.path;
+    NSString *orgPath = self.recentListArray[indexPath.row];
     NSString *homePath = NSHomeDirectory();
-    path = [path stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
+    NSString *path = [orgPath stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
     cell.textLabel.text = path;
-    NSString *branchName = self.branchInfo[aUrl.path];
+    NSString *branchName = self.branchInfo[orgPath];
     cell.detailTextLabel.text = branchName;
     return cell;
 }
