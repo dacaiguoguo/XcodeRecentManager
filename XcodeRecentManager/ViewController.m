@@ -138,7 +138,8 @@
 
 #pragma tableView--UITableViewDelegate
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSURL *aUrl = self.recentListArray[indexPath.row];
+    NSString *orgPath = self.recentListArray[indexPath.row];
+    NSURL *aUrl = [NSURL fileURLWithPath:orgPath];
     [[UIApplication sharedApplication] openURL:aUrl options:@{} completionHandler:^(BOOL success) {
         NSLog(@"%@", @(success));
     }];
