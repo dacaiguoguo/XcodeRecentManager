@@ -12,16 +12,14 @@ let FD = FileManager.default
 class SFLListItem: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool = true
 
-    var bookmark:NSData
-    var url:NSURL
+    var url:NSURL?
 
     func encode(with coder: NSCoder) {
 
     }
 
     required init?(coder: NSCoder) {
-        bookmark = coder.decodeObject(of: NSData.self, forKey: "bookmark") ?? NSData()
-        url = coder.decodeObject(of: NSURL.self, forKey: "URL") ?? NSURL()
+        url = coder.decodeObject(of: NSURL.self, forKey: "URL")
     }
 }
 
@@ -47,7 +45,7 @@ func readSflWithFile(_ filePath:String) -> [String] {
                                 }
                             }
                         } else if let dicItem = item as? SFLListItem {
-                            if let aPath = dicItem.url.path {
+                            if let aPath = dicItem.url?.path {
                                 resultArray.append(aPath)
                             }
                         }
@@ -58,7 +56,7 @@ func readSflWithFile(_ filePath:String) -> [String] {
              print(error)
         }
     } else {
-        print("没有权限访问!\(pathOfRecent)")
+        print("文件读取报错!\(filePath)")
     }
 
     return resultArray
