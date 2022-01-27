@@ -17,6 +17,8 @@
 		9D15C89E26CCABDC003154B6 /* SFLListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D15C89C26CCABDC003154B6 /* SFLListItem.m */; };
 		9D7F18C326B1880900F3A4B1 /* MacTask.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = 9D7F18BC26B187F600F3A4B1 /* MacTask.bundle */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9D7F18C926B1886300F3A4B1 /* LVTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F18C826B1886300F3A4B1 /* LVTask.m */; };
+		9DCE52A227A2C37C00D39B77 /* ProjectViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DCE52A027A2C37C00D39B77 /* ProjectViewCell.m */; };
+		9DCE52A327A2C37C00D39B77 /* ProjectViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9DCE52A127A2C37C00D39B77 /* ProjectViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +75,9 @@
 		9D7F18BE26B187F600F3A4B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D7F18C726B1886300F3A4B1 /* LVTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LVTask.h; sourceTree = "<group>"; };
 		9D7F18C826B1886300F3A4B1 /* LVTask.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LVTask.m; sourceTree = "<group>"; };
+		9DCE529F27A2C37C00D39B77 /* ProjectViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProjectViewCell.h; sourceTree = "<group>"; };
+		9DCE52A027A2C37C00D39B77 /* ProjectViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProjectViewCell.m; sourceTree = "<group>"; };
+		9DCE52A127A2C37C00D39B77 /* ProjectViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProjectViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +127,9 @@
 				9D0A61EA26B143B80069D967 /* SceneDelegate.m */,
 				9D0A61EC26B143B80069D967 /* ViewController.h */,
 				9D0A61ED26B143B80069D967 /* ViewController.m */,
+				9DCE529F27A2C37C00D39B77 /* ProjectViewCell.h */,
+				9DCE52A027A2C37C00D39B77 /* ProjectViewCell.m */,
+				9DCE52A127A2C37C00D39B77 /* ProjectViewCell.xib */,
 				9D15C89D26CCABDC003154B6 /* SFLListItem.h */,
 				9D15C89C26CCABDC003154B6 /* SFLListItem.m */,
 				9D0A61EF26B143B80069D967 /* Main.storyboard */,
@@ -232,6 +240,7 @@
 			files = (
 				9D0A61F626B143BB0069D967 /* LaunchScreen.storyboard in Resources */,
 				9D0A61F326B143BB0069D967 /* Assets.xcassets in Resources */,
+				9DCE52A327A2C37C00D39B77 /* ProjectViewCell.xib in Resources */,
 				9D0A61F126B143B80069D967 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -250,6 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DCE52A227A2C37C00D39B77 /* ProjectViewCell.m in Sources */,
 				9D0A61EE26B143B80069D967 /* ViewController.m in Sources */,
 				9D0A61E826B143B80069D967 /* AppDelegate.m in Sources */,
 				9D0A61F926B143BB0069D967 /* main.m in Sources */,

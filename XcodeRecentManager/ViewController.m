@@ -7,12 +7,16 @@
 
 #import "ViewController.h"
 #import "SFLListItem.h"
+#import "ProjectViewCell.h"
 
 // #if TARGET_OS_MACCATALYST
 
-@interface ViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource> {
+    NSString *homePath;
+}
 @property (nonatomic, copy) NSArray *recentListArray;
 @property (nonatomic, copy) NSDictionary *branchInfo;
+@property (nonatomic, copy) NSDictionary *iconInfo;
 @property (nonatomic, strong) UITableView *tableView;
 @end
 
@@ -20,8 +24,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    homePath = NSHomeDirectory();
     self.title = @"最近文件列表";
     [self.view addSubview:self.tableView];
+
+    UINib *nib = [UINib nibWithNibName:@"ProjectViewCell" bundle:nil];
+    [self.tableView registerNib:nib forCellReuseIdentifier:@"ProjectViewCell"];
     [self loadData];
 
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -72,15 +80,40 @@
         NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
         NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
         [bundle load];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
 
         // Load the principal class from the bundle
         // This is set in MacTask/Info.plist
         Class principalClass = bundle.principalClass;
         NSURL *workingDir = [NSFileManager defaultManager].temporaryDirectory;
         NSMutableDictionary *branchInfo = [NSMutableDictionary dictionary];
+        NSMutableDictionary *iconInfo = [NSMutableDictionary dictionary];
+
         //#endif
         [self->_recentListArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSString *workPath = obj.stringByDeletingLastPathComponent;
+            NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:[NSURL fileURLWithPath:obj.stringByDeletingPathExtension] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
+            // /Users/sunyanguo/Developer/newlvmama12/Lvmm/Resource/LvmmImage.xcassets/AppIcon.appiconset
+            NSURL *appiconset = nil;
+            for (NSURL *fileUrl in enumerator) {
+                // NSLog(@"%@", fileUrl);增加深度限制，max-depth
+                NSString *aItem = [fileUrl lastPathComponent];
+                if ([@"AppIcon.appiconset" isEqualToString:aItem]) {
+                    appiconset = fileUrl;
+                    break;
+                }
+            }
+            if (appiconset) {
+                NSDirectoryEnumerator *enumeratorIcon = [fileManager enumeratorAtURL:appiconset includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
+                for (NSURL *fileUrl in enumeratorIcon) {
+                    UIImage *image = [UIImage imageWithContentsOfFile:fileUrl.path];
+                    if (image.size.width >= 60 && image.size.width <= 160) {
+                        iconInfo[obj] = image;
+                        break;
+                    }
+                }
+            }
+
             SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
             NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
             NSNumber *code = result[@"code"];
@@ -90,12 +123,13 @@
                 for (NSString *item in resultArray) {
                     if ([item hasPrefix:@"*"]) {
                         NSLog(@"%@ %@", code, item);
-                        branchInfo[obj] = item;
+                        branchInfo[obj] = [item substringFromIndex:1];
                     }
                 }
             }
         }];
         self.branchInfo = branchInfo;
+        self.iconInfo = iconInfo;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
         });
@@ -117,22 +151,24 @@
     return 1;
 }
 
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 50;
+}
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.recentListArray.count;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *identifier = @"identifier";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
-    }
+    static NSString *identifier = @"ProjectViewCell";
+    ProjectViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
     NSString *orgPath = self.recentListArray[indexPath.row];
-    NSString *homePath = NSHomeDirectory();
     NSString *path = [orgPath stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
-    cell.textLabel.text = path;
+    cell.pathLabel.text = path;
     NSString *branchName = self.branchInfo[orgPath];
-    cell.detailTextLabel.text = branchName;
+    cell.branchLabel.text = branchName;
+    cell.iconImageView.image = self.iconInfo[orgPath]?:[UIImage imageNamed:@"XcodeIcon"];
     return cell;
 }
 

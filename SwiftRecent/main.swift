@@ -76,6 +76,16 @@ if hasnext == false {
     print("没有权限访问!\(pathOfRecent)")
 }
 
+do {
+    let jsonEncoder = JSONEncoder()
+    jsonEncoder.outputFormatting = .prettyPrinted
+    let json = try jsonEncoder.encode(resultArray)
+    let jsonString = String(data: json, encoding: .utf8)
+    print(jsonString ?? "")
+
+} catch {
+    print(error.localizedDescription)
+}
 
 
 
