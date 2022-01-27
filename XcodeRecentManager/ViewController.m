@@ -96,7 +96,7 @@
             // /Users/sunyanguo/Developer/newlvmama12/Lvmm/Resource/LvmmImage.xcassets/AppIcon.appiconset
             NSURL *appiconset = nil;
             for (NSURL *fileUrl in enumerator) {
-                // NSLog(@"%@", fileUrl);增加深度限制，max-depth
+                // NSLog(@"%@", fileUrl);todo:增加深度限制，max-depth
                 NSString *aItem = [fileUrl lastPathComponent];
                 if ([@"AppIcon.appiconset" isEqualToString:aItem]) {
                     appiconset = fileUrl;
@@ -124,6 +124,7 @@
                     if ([item hasPrefix:@"*"]) {
                         NSLog(@"%@ %@", code, item);
                         branchInfo[obj] = [item substringFromIndex:1];
+                        break;
                     }
                 }
             }
