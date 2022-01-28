@@ -17,7 +17,8 @@
 @property (nonatomic, copy) NSArray *recentListArray;
 @property (nonatomic, copy) NSDictionary *branchInfo;
 @property (nonatomic, copy) NSDictionary *iconInfo;
-@property (nonatomic, strong) UITableView *tableView;
+@property (strong, nonatomic) IBOutlet UITableView *tableView;
+
 @end
 
 @implementation ViewController
@@ -25,8 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     homePath = NSHomeDirectory();
-    self.title = @"最近文件列表";
-    [self.view addSubview:self.tableView];
+    self.title = @"Open Recent";
 
     UINib *nib = [UINib nibWithNibName:@"ProjectViewCell" bundle:nil];
     [self.tableView registerNib:nib forCellReuseIdentifier:@"ProjectViewCell"];
@@ -137,15 +137,6 @@
     });
 }
 
-#pragma mark tableView lazy
--(UITableView *)tableView {
-    if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:self.view.bounds style:UITableViewStylePlain];
-        _tableView.delegate = self;
-        _tableView.dataSource = self;
-    }
-    return _tableView;
-}
 
 #pragma tableView UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
