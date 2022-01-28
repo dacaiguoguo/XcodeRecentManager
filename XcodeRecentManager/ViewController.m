@@ -170,6 +170,7 @@
     NSString *branchName = self.branchInfo[orgPath];
     cell.branchLabel.text = branchName;
     cell.iconImageView.image = self.iconInfo[orgPath]?:[UIImage imageNamed:@"XcodeIcon"];
+    cell.iconImageView.layer.cornerRadius = 8;
     return cell;
 }
 
