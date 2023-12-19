@@ -46,20 +46,36 @@
 
 - (void)loadData {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-
-//    NSString *filePath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl2".stringByStandardizingPath;
-    NSString *filePath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl3".stringByStandardizingPath;
+    NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments".stringByStandardizingPath;
+    NSString *filePath = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl3"];
     
     BOOL isExist = [fileManager fileExistsAtPath:filePath];
     if (!isExist) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"file Not Exists" message:nil preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *filePathold = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl2"];
+        BOOL isExistold = [fileManager fileExistsAtPath:filePathold];
+        if (!isExistold) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"请设置完全磁盘访问权限" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    NSURL *aUrl = [NSURL fileURLWithPath:documentPath];
+                    [[UIApplication sharedApplication] openURL:aUrl options:@{} completionHandler:^(BOOL success) {
+                        NSLog(@"%@", @(success));
+                        NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
+                        NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
+                        [bundle load];
+                        NSFileManager *fileManager = [NSFileManager defaultManager];
 
-            }]];
-            [self presentViewController:alert animated:YES completion:nil];
-        });
-        return;
+                        // Load the principal class from the bundle
+                        // This is set in MacTask/Info.plist
+                        Class principalClass = bundle.principalClass;
+                        SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
+                        NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
+                    }];
+                }]];
+                [self presentViewController:alert animated:YES completion:nil];
+            });
+            return;
+        }
     }
     NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
     NSError *err = nil;
