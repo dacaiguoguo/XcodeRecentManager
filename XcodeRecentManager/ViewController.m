@@ -21,13 +21,16 @@
 
 @end
 
+
+
+
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     homePath = NSHomeDirectory();
     self.title = @"Open Recent";
-
+    
     UINib *nib = [UINib nibWithNibName:@"ProjectViewCell" bundle:nil];
     [self.tableView registerNib:nib forCellReuseIdentifier:@"ProjectViewCell"];
     [self loadData];
@@ -36,6 +39,7 @@
     [button setImage:[UIImage systemImageNamed:@"arrow.clockwise.circle"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(refreshAction:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    
     self.navigationItem.rightBarButtonItem = barButton;
 }
 
@@ -51,26 +55,19 @@
     
     BOOL isExist = [fileManager fileExistsAtPath:filePath];
     if (!isExist) {
-        NSString *filePathold = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl2"];
-        BOOL isExistold = [fileManager fileExistsAtPath:filePathold];
-        if (!isExistold) {
+        NSString *filePathOld = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl2"];
+        BOOL isExistold = [fileManager fileExistsAtPath:filePathOld];
+        if (isExistold) {
+            filePath = filePathOld;
+        } else {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"请设置完全磁盘访问权限" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"文件不存在"
+                                                                               message:@"请设置完全磁盘访问权限"
+                                                                        preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    NSURL *aUrl = [NSURL fileURLWithPath:documentPath];
-                    [[UIApplication sharedApplication] openURL:aUrl options:@{} completionHandler:^(BOOL success) {
-                        NSLog(@"%@", @(success));
-                        NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
-                        NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
-                        [bundle load];
-                        NSFileManager *fileManager = [NSFileManager defaultManager];
-
-                        // Load the principal class from the bundle
-                        // This is set in MacTask/Info.plist
-                        Class principalClass = bundle.principalClass;
-                        SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
-                        NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
-                    }];
+                    // NSURL *aUrl = [NSURL fileURLWithPath:documentPath];
+                    // [[UIApplication sharedApplication] openURL:aUrl options:@{} completionHandler:^(BOOL success) {NSLog(@"%@", @(success));}];
+                    [self openSystemPreferences];
                 }]];
                 [self presentViewController:alert animated:YES completion:nil];
             });
@@ -82,9 +79,11 @@
     NSData *data = [[NSData alloc] initWithContentsOfURL:fileUrl options:(NSDataReadingMappedIfSafe) error:&err];
     if (err || data==nil) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:(err.localizedDescription?:@"no data") preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"读取失败"
+                                                                           message:@"请设置完全磁盘访问权限"
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-
+                [self openSystemPreferences];
             }]];
             [self presentViewController:alert animated:YES completion:nil];
         });
@@ -155,7 +154,17 @@
     });
 }
 
+- (void)openSystemPreferences {
+    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
+    NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
+    [bundle load];
 
+    // Load the principal class from the bundle
+    // This is set in MacTask/Info.plist
+    Class principalClass = bundle.principalClass;
+    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
+    __unused NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
+}
 #pragma tableView UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
