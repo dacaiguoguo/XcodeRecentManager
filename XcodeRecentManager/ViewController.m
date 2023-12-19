@@ -47,7 +47,9 @@
 - (void)loadData {
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
-    NSString *filePath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl2".stringByStandardizingPath;
+//    NSString *filePath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl2".stringByStandardizingPath;
+    NSString *filePath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl3".stringByStandardizingPath;
+    
     BOOL isExist = [fileManager fileExistsAtPath:filePath];
     if (!isExist) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
