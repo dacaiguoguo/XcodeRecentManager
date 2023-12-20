@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface LVTask : NSObject
 + (NSDictionary *)runShell:(NSArray<NSString *> *)arguments workingDirectory:(NSURL *)workingDir;
++ (NSURL *)selectFolderBtnClicked:(id)sender;
 @end
 
 NS_ASSUME_NONNULL_END

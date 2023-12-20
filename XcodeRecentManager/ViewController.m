@@ -34,7 +34,7 @@
     UINib *nib = [UINib nibWithNibName:@"ProjectViewCell" bundle:nil];
     [self.tableView registerNib:nib forCellReuseIdentifier:@"ProjectViewCell"];
     [self loadData];
-
+    
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setImage:[UIImage systemImageNamed:@"arrow.clockwise.circle"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(refreshAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -47,12 +47,27 @@
     [self loadData];
     [self.tableView reloadData];
 }
-
 - (void)loadData {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
     NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments".stringByStandardizingPath;
-    NSString *filePath = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl3"];
+    NSData *urldata = [NSUserDefaults.standardUserDefaults objectForKey:@"savedataKey"];
+    if (urldata) {
+        BOOL isStale = NO;
+        NSURL *docurl = [NSURL URLByResolvingBookmarkData:urldata options:NSURLBookmarkResolutionWithSecurityScope relativeToURL:nil bookmarkDataIsStale:&isStale error:nil];
+        if (isStale) {
+            NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
+            [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"savedataKey"];
+        }
+        [docurl startAccessingSecurityScopedResource];
+        if (docurl.path) {
+            documentPath = docurl.path;
+        }
+    }
     
+    NSString *filePath = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl3"];
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+
     BOOL isExist = [fileManager fileExistsAtPath:filePath];
     if (!isExist) {
         NSString *filePathOld = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl2"];
@@ -89,23 +104,23 @@
         });
         return;
     }
-
+    
     self.recentListArray = readSflWithFile(filePath);
-
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         //#if TARGET_OS_MACCATALYST
         NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
         NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
         [bundle load];
         NSFileManager *fileManager = [NSFileManager defaultManager];
-
+        
         // Load the principal class from the bundle
         // This is set in MacTask/Info.plist
         Class principalClass = bundle.principalClass;
         NSURL *workingDir = [NSFileManager defaultManager].temporaryDirectory;
         NSMutableDictionary *branchInfo = [NSMutableDictionary dictionary];
         NSMutableDictionary *iconInfo = [NSMutableDictionary dictionary];
-
+        
         //#endif
         [self->_recentListArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSString *workPath = obj.stringByDeletingLastPathComponent;
@@ -130,7 +145,7 @@
                     }
                 }
             }
-
+            
             SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
             NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
             NSNumber *code = result[@"code"];
@@ -154,6 +169,7 @@
     });
 }
 
+
 - (void)openSystemPreferences {
     NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
     NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
@@ -162,8 +178,17 @@
     // Load the principal class from the bundle
     // This is set in MacTask/Info.plist
     Class principalClass = bundle.principalClass;
-    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
-    __unused NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
+    SEL selector = NSSelectorFromString(@"selectFolderBtnClicked:");
+    NSURL *docurl = [principalClass performSelector:selector withObject:nil];
+    if (docurl) {
+        NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
+        [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"savedataKey"];
+        printf("sss");
+        [self loadData];
+    }
+
+//    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
+//    __unused NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
 }
 #pragma tableView UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
