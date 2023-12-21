@@ -40,24 +40,42 @@
     [button addTarget:self action:@selector(refreshAction:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithCustomView:button];
     
-    self.navigationItem.rightBarButtonItem = barButton;
+    UIButton *devbutton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [devbutton setImage:[UIImage systemImageNamed:@"filemenu.and.cursorarrow"] forState:UIControlStateNormal];
+    [devbutton addTarget:self action:@selector(openDeveloper:) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *barDevButton = [[UIBarButtonItem alloc] initWithCustomView:devbutton];
+    
+    self.navigationItem.rightBarButtonItems = @[barDevButton, barButton];
+    
+    NSData *urldata = [NSUserDefaults.standardUserDefaults objectForKey:@"Developer"];
+    if (urldata) {
+        BOOL isStale = NO;
+        NSURL *docurl = [NSURL URLByResolvingBookmarkData:urldata options:NSURLBookmarkResolutionWithSecurityScope relativeToURL:nil bookmarkDataIsStale:&isStale error:nil];
+        if (isStale) {
+            NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
+            [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"Developer"];
+        }
+         [docurl startAccessingSecurityScopedResource];
+    }
 }
 
 - (void)refreshAction:(id)sender {
     [self loadData];
     [self.tableView reloadData];
 }
+
 - (void)loadData {
-    NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments".stringByStandardizingPath;
-    NSData *urldata = [NSUserDefaults.standardUserDefaults objectForKey:@"savedataKey"];
+    NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/".stringByStandardizingPath;
+    NSData *urldata = [NSUserDefaults.standardUserDefaults objectForKey:@"ApplicationRecentDocuments"];
     if (urldata) {
         BOOL isStale = NO;
         NSURL *docurl = [NSURL URLByResolvingBookmarkData:urldata options:NSURLBookmarkResolutionWithSecurityScope relativeToURL:nil bookmarkDataIsStale:&isStale error:nil];
         if (isStale) {
             NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
-            [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"savedataKey"];
+            [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
         }
-        [docurl startAccessingSecurityScopedResource];
+         [docurl startAccessingSecurityScopedResource];
+        // [docurl stopAccessingSecurityScopedResource];
         if (docurl.path) {
             documentPath = docurl.path;
         }
@@ -77,7 +95,7 @@
         } else {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"文件不存在"
-                                                                               message:@"请设置完全磁盘访问权限"
+                                                                               message:@"请授予文件夹访问权限"
                                                                         preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     // NSURL *aUrl = [NSURL fileURLWithPath:documentPath];
@@ -95,7 +113,7 @@
     if (err || data==nil) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"读取失败"
-                                                                           message:@"请设置完全磁盘访问权限"
+                                                                           message:@"请授予文件夹访问权限"
                                                                     preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [self openSystemPreferences];
@@ -125,12 +143,12 @@
         [self->_recentListArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSString *workPath = obj.stringByDeletingLastPathComponent;
             NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:[NSURL fileURLWithPath:obj.stringByDeletingPathExtension] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
-            // /Users/sunyanguo/Developer/newlvmama12/Lvmm/Resource/LvmmImage.xcassets/AppIcon.appiconset
             NSURL *appiconset = nil;
             for (NSURL *fileUrl in enumerator) {
                 // NSLog(@"%@", fileUrl);todo:增加深度限制，max-depth
                 NSString *aItem = [fileUrl lastPathComponent];
-                if ([@"AppIcon.appiconset" isEqualToString:aItem]) {
+                //appiconset
+                if ([@"appiconset" isEqualToString:aItem.pathExtension]) {
                     appiconset = fileUrl;
                     break;
                 }
@@ -139,7 +157,7 @@
                 NSDirectoryEnumerator *enumeratorIcon = [fileManager enumeratorAtURL:appiconset includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
                 for (NSURL *fileUrl in enumeratorIcon) {
                     UIImage *image = [UIImage imageWithContentsOfFile:fileUrl.path];
-                    if (image.size.width >= 60 && image.size.width <= 160) {
+                    if (image.size.width >= 60 && image.size.width <= 1200) {
                         iconInfo[obj] = image;
                         break;
                     }
@@ -170,6 +188,26 @@
 }
 
 
+- (void)openDeveloper:(id)sender {
+    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
+    NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
+    [bundle load];
+
+    // Load the principal class from the bundle
+    // This is set in MacTask/Info.plist
+    Class principalClass = bundle.principalClass;
+    SEL selector = NSSelectorFromString(@"selectopenDeveloperFolderBtnClicked:");
+    NSURL *docurl = [principalClass performSelector:selector withObject:nil];
+    if (docurl) {
+        NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
+        [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"Developer"];
+        [self loadData];
+    }
+
+//    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
+//    __unused NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
+}
+
 - (void)openSystemPreferences {
     NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
     NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
@@ -182,8 +220,7 @@
     NSURL *docurl = [principalClass performSelector:selector withObject:nil];
     if (docurl) {
         NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
-        [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"savedataKey"];
-        printf("sss");
+        [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
         [self loadData];
     }
 
