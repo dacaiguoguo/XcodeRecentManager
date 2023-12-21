@@ -36,16 +36,21 @@
     [self loadData];
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button setImage:[UIImage systemImageNamed:@"arrow.clockwise.circle"] forState:UIControlStateNormal];
+    // [button setImage:[UIImage systemImageNamed:@"arrow.clockwise.circle"] forState:UIControlStateNormal];
+    [button setTitle:@"刷新" forState:UIControlStateNormal];
+    [button setTitleColor:UIColor.systemBlueColor forState:UIControlStateNormal];
     [button addTarget:self action:@selector(refreshAction:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithCustomView:button];
     
     UIButton *devbutton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [devbutton setImage:[UIImage systemImageNamed:@"filemenu.and.cursorarrow"] forState:UIControlStateNormal];
+    // [devbutton setImage:[UIImage systemImageNamed:@"filemenu.and.cursorarrow"] forState:UIControlStateNormal];
+    [devbutton setTitle:@"选择开发文件夹" forState:UIControlStateNormal];
+    [devbutton setTitleColor:UIColor.systemBlueColor forState:UIControlStateNormal];
+
     [devbutton addTarget:self action:@selector(openDeveloper:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *barDevButton = [[UIBarButtonItem alloc] initWithCustomView:devbutton];
     
-    self.navigationItem.rightBarButtonItems = @[barDevButton, barButton];
+    self.navigationItem.rightBarButtonItems = @[ barButton, barDevButton];
     
     NSData *urldata = [NSUserDefaults.standardUserDefaults objectForKey:@"Developer"];
     if (urldata) {
