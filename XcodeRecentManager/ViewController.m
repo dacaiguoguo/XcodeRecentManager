@@ -8,6 +8,8 @@
 #import "ViewController.h"
 #import "SFLListItem.h"
 #import "ProjectViewCell.h"
+static NSString * const kApplicationRecentDocumentsKey = @"ApplicationRecentDocuments";
+static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
 
 // #if TARGET_OS_MACCATALYST
 
@@ -28,40 +30,65 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     homePath = NSHomeDirectory();
+    
+    // Remove unnecessary user defaults
+    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
+    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
+    
     self.title = @"Open Recent";
     
-    UINib *nib = [UINib nibWithNibName:@"ProjectViewCell" bundle:nil];
-    [self.tableView registerNib:nib forCellReuseIdentifier:@"ProjectViewCell"];
+    // Register the nib for the table view
+    [self.tableView registerNib:[UINib nibWithNibName:@"ProjectViewCell" bundle:nil] forCellReuseIdentifier:@"ProjectViewCell"];
+    
     [self loadData];
     
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    // [button setImage:[UIImage systemImageNamed:@"arrow.clockwise.circle"] forState:UIControlStateNormal];
-    [button setTitle:@"刷新" forState:UIControlStateNormal];
-    [button setTitleColor:UIColor.systemBlueColor forState:UIControlStateNormal];
-    [button addTarget:self action:@selector(refreshAction:) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    // Create and set up the "Refresh" button
+    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithTitle:@"刷新"
+                                                                      style:UIBarButtonItemStylePlain
+                                                                     target:self
+                                                                     action:@selector(refreshAction:)];
+    [refreshButton setTintColor:UIColor.systemBlueColor];
     
-    UIButton *devbutton = [UIButton buttonWithType:UIButtonTypeCustom];
-    // [devbutton setImage:[UIImage systemImageNamed:@"filemenu.and.cursorarrow"] forState:UIControlStateNormal];
-    [devbutton setTitle:@"选择开发文件夹" forState:UIControlStateNormal];
-    [devbutton setTitleColor:UIColor.systemBlueColor forState:UIControlStateNormal];
+    // Create and set up the "Select Developer Folder" button
+    UIBarButtonItem *devButton = [[UIBarButtonItem alloc] initWithTitle:@"选择开发文件夹"
+                                                                  style:UIBarButtonItemStylePlain
+                                                                 target:self
+                                                                 action:@selector(openDeveloper:)];
+    [devButton setTintColor:UIColor.systemBlueColor];
+    
+    UIBarButtonItem *fileButton = [[UIBarButtonItem alloc] initWithTitle:@"授权历史文件夹"
+                                                                   style:UIBarButtonItemStylePlain
+                                                                  target:self
+                                                                  action:@selector(openSystemPreferences:)];
+    [fileButton setTintColor:UIColor.systemBlueColor];
+    self.navigationItem.rightBarButtonItems = @[refreshButton, devButton, fileButton];
+    
+    // Check and access the security-scoped resource for the developer folder
+    NSURL *docURL = [self resolveBookmarkDataOfKey:@"Developer"];
+    [docURL startAccessingSecurityScopedResource];
+}
 
-    [devbutton addTarget:self action:@selector(openDeveloper:) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barDevButton = [[UIBarButtonItem alloc] initWithCustomView:devbutton];
+- (NSURL *)resolveBookmarkDataOfKey:(NSString *)key {
+    NSData *bookmarkData = [NSUserDefaults.standardUserDefaults objectForKey:key];
     
-    self.navigationItem.rightBarButtonItems = @[ barButton, barDevButton];
+    BOOL isStale = NO;
+    NSURL *docURL = [NSURL URLByResolvingBookmarkData:bookmarkData
+                                              options:NSURLBookmarkResolutionWithSecurityScope
+                                        relativeToURL:nil
+                                  bookmarkDataIsStale:&isStale
+                                                error:nil];
     
-    NSData *urldata = [NSUserDefaults.standardUserDefaults objectForKey:@"Developer"];
-    if (urldata) {
-        BOOL isStale = NO;
-        NSURL *docurl = [NSURL URLByResolvingBookmarkData:urldata options:NSURLBookmarkResolutionWithSecurityScope relativeToURL:nil bookmarkDataIsStale:&isStale error:nil];
-        if (isStale) {
-            NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
-            [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"Developer"];
-        }
-         [docurl startAccessingSecurityScopedResource];
+    if (isStale) {
+        NSData *savedata = [docURL bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
+                            includingResourceValuesForKeys:nil
+                                             relativeToURL:nil
+                                                     error:nil];
+        [NSUserDefaults.standardUserDefaults setObject:savedata forKey:key];
     }
+    
+    return docURL;
 }
 
 - (void)refreshAction:(id)sender {
@@ -69,62 +96,81 @@
     [self.tableView reloadData];
 }
 
+
 - (void)loadData {
-    NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/".stringByStandardizingPath;
-    NSData *urldata = [NSUserDefaults.standardUserDefaults objectForKey:@"ApplicationRecentDocuments"];
-    if (urldata) {
-        BOOL isStale = NO;
-        NSURL *docurl = [NSURL URLByResolvingBookmarkData:urldata options:NSURLBookmarkResolutionWithSecurityScope relativeToURL:nil bookmarkDataIsStale:&isStale error:nil];
-        if (isStale) {
-            NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
-            [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
-        }
-         [docurl startAccessingSecurityScopedResource];
-        // [docurl stopAccessingSecurityScopedResource];
-        if (docurl.path) {
-            documentPath = docurl.path;
-        }
+    NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
+    [docURL startAccessingSecurityScopedResource];
+    
+    NSString *filePath = [self filePathForDocumentPath:docURL.path];
+    
+    if (!filePath) {
+        [self handleFileNotFound];
+        return;
     }
     
-    NSString *filePath = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl3"];
+    [self runWithFilePath:filePath];
+}
 
+- (NSString *)filePathForDocumentPath:(NSString *)documentPath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = [documentPath stringByAppendingPathComponent:kXcodeSFLFileName];
     
-
-    BOOL isExist = [fileManager fileExistsAtPath:filePath];
-    if (!isExist) {
-        NSString *filePathOld = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl2"];
-        BOOL isExistold = [fileManager fileExistsAtPath:filePathOld];
-        if (isExistold) {
-            filePath = filePathOld;
+    if (![fileManager fileExistsAtPath:filePath]) {
+        NSString *oldFilePath = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl2"];
+        if ([fileManager fileExistsAtPath:oldFilePath]) {
+            filePath = oldFilePath;
         } else {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"文件不存在"
-                                                                               message:@"请授予文件夹访问权限"
-                                                                        preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    // NSURL *aUrl = [NSURL fileURLWithPath:documentPath];
-                    // [[UIApplication sharedApplication] openURL:aUrl options:@{} completionHandler:^(BOOL success) {NSLog(@"%@", @(success));}];
-                    [self openSystemPreferences];
-                }]];
-                [self presentViewController:alert animated:YES completion:nil];
-            });
-            return;
+            return nil; // File not found
         }
     }
-    NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
-    NSError *err = nil;
-    NSData *data = [[NSData alloc] initWithContentsOfURL:fileUrl options:(NSDataReadingMappedIfSafe) error:&err];
-    if (err || data==nil) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"读取失败"
-                                                                           message:@"请授予文件夹访问权限"
-                                                                    preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [self openSystemPreferences];
-            }]];
-            [self presentViewController:alert animated:YES completion:nil];
-        });
+    
+    return filePath;
+}
+
+- (void)handleFileNotFound {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"未获取到记录文件"
+                                                                             message:@"请授予文件夹访问权限"
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *grantAction = [UIAlertAction actionWithTitle:@"现在授予"
+                                                          style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * _Nonnull action) {
+        [self openSystemPreferences:nil];
+    }];
+    
+    UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后再说"
+                                                          style:UIAlertActionStyleCancel
+                                                        handler:nil];
+    
+    [alertController addAction:grantAction];
+    [alertController addAction:laterAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)handleReadFileError {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"读取失败"
+                                                                       message:@"请授予文件夹访问权限"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"OK"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction * _Nonnull action) {
+            [self openSystemPreferences:nil];
+        }]];
+        
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+}
+
+- (void)runWithFilePath:(NSString *)filePath {
+    NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+    NSError *error = nil;
+    NSData *data = [NSData dataWithContentsOfURL:fileURL options:NSDataReadingMappedIfSafe error:&error];
+    
+    if (error || data == nil) {
+        [self handleReadFileError];
         return;
     }
     
@@ -192,45 +238,43 @@
     });
 }
 
-
 - (void)openDeveloper:(id)sender {
-    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
+    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
     NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
     [bundle load];
-
+    
     // Load the principal class from the bundle
     // This is set in MacTask/Info.plist
     Class principalClass = bundle.principalClass;
-    SEL selector = NSSelectorFromString(@"selectopenDeveloperFolderBtnClicked:");
-    NSURL *docurl = [principalClass performSelector:selector withObject:nil];
+    SEL selector = NSSelectorFromString(@"selectFolderBtnClicked:");
+    NSString *documentPath = @"~/Developer".stringByStandardizingPath;
+    NSURL *docurl = [principalClass performSelector:selector withObject:documentPath];
     if (docurl) {
         NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"Developer"];
         [self loadData];
     }
-
-//    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
-//    __unused NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
 }
 
-- (void)openSystemPreferences {
-    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
+- (void)openSystemPreferences:(id)sender {
+    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
     NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
     [bundle load];
-
+    
     // Load the principal class from the bundle
     // This is set in MacTask/Info.plist
     Class principalClass = bundle.principalClass;
     SEL selector = NSSelectorFromString(@"selectFolderBtnClicked:");
-    NSURL *docurl = [principalClass performSelector:selector withObject:nil];
+    NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments".stringByStandardizingPath;
+    NSURL *docurl = [principalClass performSelector:selector withObject:documentPath];
     if (docurl) {
         NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
         [self loadData];
     }
-
-//    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
-//    __unused NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
+    
+    //    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
+    //    __unused NSDictionary *result = [principalClass performSelector:selector withObject:@[@"open", @"-a", @"System Preferences"] withObject:NSHomeDirectory()];
 }
 #pragma tableView UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

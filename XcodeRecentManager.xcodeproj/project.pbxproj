@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B16F0BD2B35283E00BA6F21 /* SwiftTool.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = 5B16F0B42B3527A200BA6F21 /* SwiftTool.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5B16F0C42B352ACD00BA6F21 /* LVTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B16F0C32B352ACD00BA6F21 /* LVTask.m */; };
 		9D0A61E826B143B80069D967 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61E726B143B80069D967 /* AppDelegate.m */; };
 		9D0A61EB26B143B80069D967 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61EA26B143B80069D967 /* SceneDelegate.m */; };
 		9D0A61EE26B143B80069D967 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61ED26B143B80069D967 /* ViewController.m */; };
@@ -15,19 +17,17 @@
 		9D0A61F626B143BB0069D967 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0A61F426B143BB0069D967 /* LaunchScreen.storyboard */; };
 		9D0A61F926B143BB0069D967 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61F826B143BB0069D967 /* main.m */; };
 		9D15C89E26CCABDC003154B6 /* SFLListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D15C89C26CCABDC003154B6 /* SFLListItem.m */; };
-		9D7F18C326B1880900F3A4B1 /* MacTask.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = 9D7F18BC26B187F600F3A4B1 /* MacTask.bundle */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		9D7F18C926B1886300F3A4B1 /* LVTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F18C826B1886300F3A4B1 /* LVTask.m */; };
 		9DCE52A227A2C37C00D39B77 /* ProjectViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DCE52A027A2C37C00D39B77 /* ProjectViewCell.m */; };
 		9DCE52A327A2C37C00D39B77 /* ProjectViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9DCE52A127A2C37C00D39B77 /* ProjectViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		9D7F18C426B1880900F3A4B1 /* PBXContainerItemProxy */ = {
+		5B16F0BB2B35283700BA6F21 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9D0A61DB26B143B80069D967 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 9D7F18BB26B187F600F3A4B1;
-			remoteInfo = MacTask;
+			remoteGlobalIDString = 5B16F0B32B3527A200BA6F21;
+			remoteInfo = SwiftTool;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -48,7 +48,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				9D7F18C326B1880900F3A4B1 /* MacTask.bundle in Embed PlugIns */,
+				5B16F0BD2B35283E00BA6F21 /* SwiftTool.bundle in Embed PlugIns */,
 			);
 			name = "Embed PlugIns";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -56,6 +56,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5B16F0B42B3527A200BA6F21 /* SwiftTool.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftTool.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B16F0C22B352ACD00BA6F21 /* LVTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVTask.h; sourceTree = "<group>"; };
+		5B16F0C32B352ACD00BA6F21 /* LVTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVTask.m; sourceTree = "<group>"; };
 		9D0A61E326B143B80069D967 /* XcodeRecentManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XcodeRecentManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0A61E626B143B80069D967 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9D0A61E726B143B80069D967 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -71,24 +74,20 @@
 		9D0A61FF26B143C00069D967 /* XcodeRecentManager.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XcodeRecentManager.entitlements; sourceTree = "<group>"; };
 		9D15C89C26CCABDC003154B6 /* SFLListItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SFLListItem.m; path = ReadApplicationRecentDocuments/ReadApplicationRecentDocuments/SFLListItem.m; sourceTree = SOURCE_ROOT; };
 		9D15C89D26CCABDC003154B6 /* SFLListItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SFLListItem.h; path = ReadApplicationRecentDocuments/ReadApplicationRecentDocuments/SFLListItem.h; sourceTree = SOURCE_ROOT; };
-		9D7F18BC26B187F600F3A4B1 /* MacTask.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MacTask.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		9D7F18BE26B187F600F3A4B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9D7F18C726B1886300F3A4B1 /* LVTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LVTask.h; sourceTree = "<group>"; };
-		9D7F18C826B1886300F3A4B1 /* LVTask.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LVTask.m; sourceTree = "<group>"; };
 		9DCE529F27A2C37C00D39B77 /* ProjectViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProjectViewCell.h; sourceTree = "<group>"; };
 		9DCE52A027A2C37C00D39B77 /* ProjectViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProjectViewCell.m; sourceTree = "<group>"; };
 		9DCE52A127A2C37C00D39B77 /* ProjectViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProjectViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		9D0A61E026B143B80069D967 /* Frameworks */ = {
+		5B16F0B12B3527A200BA6F21 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9D7F18B926B187F600F3A4B1 /* Frameworks */ = {
+		9D0A61E026B143B80069D967 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -102,7 +101,6 @@
 			isa = PBXGroup;
 			children = (
 				9D0A61E526B143B80069D967 /* XcodeRecentManager */,
-				9D7F18BD26B187F600F3A4B1 /* MacTask */,
 				9D0A61E426B143B80069D967 /* Products */,
 				9D7F18C226B1880900F3A4B1 /* Frameworks */,
 			);
@@ -112,7 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				9D0A61E326B143B80069D967 /* XcodeRecentManager.app */,
-				9D7F18BC26B187F600F3A4B1 /* MacTask.bundle */,
+				5B16F0B42B3527A200BA6F21 /* SwiftTool.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -132,6 +130,8 @@
 				9DCE52A127A2C37C00D39B77 /* ProjectViewCell.xib */,
 				9D15C89D26CCABDC003154B6 /* SFLListItem.h */,
 				9D15C89C26CCABDC003154B6 /* SFLListItem.m */,
+				5B16F0C22B352ACD00BA6F21 /* LVTask.h */,
+				5B16F0C32B352ACD00BA6F21 /* LVTask.m */,
 				9D0A61EF26B143B80069D967 /* Main.storyboard */,
 				9D0A61F226B143BB0069D967 /* Assets.xcassets */,
 				9D0A61F426B143BB0069D967 /* LaunchScreen.storyboard */,
@@ -139,16 +139,6 @@
 				9D0A61F826B143BB0069D967 /* main.m */,
 			);
 			path = XcodeRecentManager;
-			sourceTree = "<group>";
-		};
-		9D7F18BD26B187F600F3A4B1 /* MacTask */ = {
-			isa = PBXGroup;
-			children = (
-				9D7F18BE26B187F600F3A4B1 /* Info.plist */,
-				9D7F18C726B1886300F3A4B1 /* LVTask.h */,
-				9D7F18C826B1886300F3A4B1 /* LVTask.m */,
-			);
-			path = MacTask;
 			sourceTree = "<group>";
 		};
 		9D7F18C226B1880900F3A4B1 /* Frameworks */ = {
@@ -161,6 +151,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5B16F0B32B3527A200BA6F21 /* SwiftTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B16F0B72B3527A200BA6F21 /* Build configuration list for PBXNativeTarget "SwiftTool" */;
+			buildPhases = (
+				5B16F0B02B3527A200BA6F21 /* Sources */,
+				5B16F0B12B3527A200BA6F21 /* Frameworks */,
+				5B16F0B22B3527A200BA6F21 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiftTool;
+			productName = SwiftTool;
+			productReference = 5B16F0B42B3527A200BA6F21 /* SwiftTool.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 		9D0A61E226B143B80069D967 /* XcodeRecentManager */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9D0A61FC26B143BB0069D967 /* Build configuration list for PBXNativeTarget "XcodeRecentManager" */;
@@ -174,29 +181,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				9D7F18C526B1880900F3A4B1 /* PBXTargetDependency */,
+				5B16F0BC2B35283700BA6F21 /* PBXTargetDependency */,
 			);
 			name = XcodeRecentManager;
 			productName = XcodeRecentManager;
 			productReference = 9D0A61E326B143B80069D967 /* XcodeRecentManager.app */;
 			productType = "com.apple.product-type.application";
-		};
-		9D7F18BB26B187F600F3A4B1 /* MacTask */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9D7F18BF26B187F600F3A4B1 /* Build configuration list for PBXNativeTarget "MacTask" */;
-			buildPhases = (
-				9D7F18B826B187F600F3A4B1 /* Sources */,
-				9D7F18B926B187F600F3A4B1 /* Frameworks */,
-				9D7F18BA26B187F600F3A4B1 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = MacTask;
-			productName = MacTask;
-			productReference = 9D7F18BC26B187F600F3A4B1 /* MacTask.bundle */;
-			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
 
@@ -207,10 +197,11 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1510;
 				TargetAttributes = {
-					9D0A61E226B143B80069D967 = {
-						CreatedOnToolsVersion = 12.5.1;
+					5B16F0B32B3527A200BA6F21 = {
+						CreatedOnToolsVersion = 15.1;
+						LastSwiftMigration = 1510;
 					};
-					9D7F18BB26B187F600F3A4B1 = {
+					9D0A61E226B143B80069D967 = {
 						CreatedOnToolsVersion = 12.5.1;
 					};
 				};
@@ -229,12 +220,19 @@
 			projectRoot = "";
 			targets = (
 				9D0A61E226B143B80069D967 /* XcodeRecentManager */,
-				9D7F18BB26B187F600F3A4B1 /* MacTask */,
+				5B16F0B32B3527A200BA6F21 /* SwiftTool */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5B16F0B22B3527A200BA6F21 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9D0A61E126B143B80069D967 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -246,16 +244,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9D7F18BA26B187F600F3A4B1 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5B16F0B02B3527A200BA6F21 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B16F0C42B352ACD00BA6F21 /* LVTask.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9D0A61DF26B143B80069D967 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -269,22 +268,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9D7F18B826B187F600F3A4B1 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9D7F18C926B1886300F3A4B1 /* LVTask.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9D7F18C526B1880900F3A4B1 /* PBXTargetDependency */ = {
+		5B16F0BC2B35283700BA6F21 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			platformFilter = maccatalyst;
-			target = 9D7F18BB26B187F600F3A4B1 /* MacTask */;
-			targetProxy = 9D7F18C426B1880900F3A4B1 /* PBXContainerItemProxy */;
+			target = 5B16F0B32B3527A200BA6F21 /* SwiftTool */;
+			targetProxy = 5B16F0BB2B35283700BA6F21 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -308,6 +298,63 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		5B16F0B52B3527A200BA6F21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AJG2826637;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = LVTask;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yanguo.SwiftTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		5B16F0B62B3527A200BA6F21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AJG2826637;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = LVTask;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yanguo.SwiftTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
 		9D0A61FA26B143BB0069D967 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -470,45 +517,18 @@
 			};
 			name = Release;
 		};
-		9D7F18C026B187F600F3A4B1 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = AJG2826637;
-				INFOPLIST_FILE = MacTask/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.yanguo.MacTask;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
-		9D7F18C126B187F600F3A4B1 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = AJG2826637;
-				INFOPLIST_FILE = MacTask/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.yanguo.MacTask;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5B16F0B72B3527A200BA6F21 /* Build configuration list for PBXNativeTarget "SwiftTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B16F0B52B3527A200BA6F21 /* Debug */,
+				5B16F0B62B3527A200BA6F21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9D0A61DE26B143B80069D967 /* Build configuration list for PBXProject "XcodeRecentManager" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -523,15 +543,6 @@
 			buildConfigurations = (
 				9D0A61FD26B143BB0069D967 /* Debug */,
 				9D0A61FE26B143BB0069D967 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9D7F18BF26B187F600F3A4B1 /* Build configuration list for PBXNativeTarget "MacTask" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9D7F18C026B187F600F3A4B1 /* Debug */,
-				9D7F18C126B187F600F3A4B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
