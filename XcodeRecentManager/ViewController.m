@@ -211,15 +211,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         //#if TARGET_OS_MACCATALYST
-        NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
-        NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
-        [bundle load];
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        
-        // Load the principal class from the bundle
-        // This is set in MacTask/Info.plist
-        Class principalClass = bundle.principalClass;
-        NSURL *workingDir = [NSFileManager defaultManager].temporaryDirectory;
         NSMutableDictionary *branchInfo = [NSMutableDictionary dictionary];
         NSMutableDictionary *iconInfo = [NSMutableDictionary dictionary];
         
