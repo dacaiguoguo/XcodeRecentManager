@@ -219,6 +219,7 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
             
             SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
             NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
+            NSLog(@"dacaiguoguogit:%@ %@", workPath, result);
             NSNumber *code = result[@"code"];
             if (code.intValue == 0) { /// code == 0 命令执行成功
                 NSString *output = result[@"output"];
