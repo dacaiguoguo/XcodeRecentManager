@@ -34,8 +34,8 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
     homePath = NSHomeDirectory();
     
     // Remove unnecessary user defaults
-    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
-    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
+    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
+    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
     
     self.title = @"Open Recent";
     
@@ -178,7 +178,7 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         //#if TARGET_OS_MACCATALYST
-        NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"MacTask.bundle"].path;
+        NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
         NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
         [bundle load];
         NSFileManager *fileManager = [NSFileManager defaultManager];
