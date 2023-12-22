@@ -11,6 +11,39 @@
 static NSString * const kApplicationRecentDocumentsKey = @"ApplicationRecentDocuments";
 static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
 
+#import <Foundation/Foundation.h>
+
+NSString *findGitFolder(NSString *currentPath, NSInteger maxDepth, NSInteger currentDepth) {
+    while (![currentPath isEqualToString:@"/"] && currentDepth <= maxDepth) {
+        NSString *gitFolderPath = [currentPath stringByAppendingPathComponent:@".git"];
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:gitFolderPath isDirectory:NULL]) {
+            return gitFolderPath;
+        } else {
+            currentPath = [currentPath stringByDeletingLastPathComponent];
+            currentDepth++;
+        }
+    }
+    
+    return nil;
+}
+
+NSString *readHEADContents(NSString *gitFolderPath) {
+    NSString *headPath = [gitFolderPath stringByAppendingPathComponent:@"HEAD"];
+    
+    NSError *error;
+    NSString *headContents = [NSString stringWithContentsOfFile:headPath
+                                                      encoding:NSUTF8StringEncoding
+                                                         error:&error];
+    
+    if (error) {
+        NSLog(@"Error reading HEAD file: %@", error.localizedDescription);
+        return nil;
+    }
+    
+    return headContents;
+}
+
 // #if TARGET_OS_MACCATALYST
 
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource> {
@@ -33,7 +66,9 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
     NSString *username = NSUserName();
 
     homePath = [NSString stringWithFormat:@"/Users/%@", username];
-    
+    // Check and access the security-scoped resource for the developer folder
+    NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
+    homePath = developerURL.path;
     // Remove unnecessary user defaults
     // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
     // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
@@ -66,10 +101,7 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
     [fileButton setTintColor:UIColor.systemBlueColor];
     self.navigationItem.rightBarButtonItems = @[refreshButton, devButton, fileButton];
     
-    // Check and access the security-scoped resource for the developer folder
-    NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
-    homePath = developerURL.path;
-    [developerURL startAccessingSecurityScopedResource];
+
 }
 
 - (NSURL *)resolveBookmarkDataOfKey:(NSString *)key {
@@ -89,7 +121,7 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
                                                      error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:key];
     }
-    
+    [docURL startAccessingSecurityScopedResource];
     return docURL;
 }
 
@@ -101,7 +133,6 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
 
 - (void)loadData {
     NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
-    [docURL startAccessingSecurityScopedResource];
     
     NSString *filePath = [self filePathForDocumentPath:docURL.path];
     
@@ -217,21 +248,42 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
                 }
             }
             
-            SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
-            NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
-            NSLog(@"dacaiguoguogit:%@ %@", workPath, result);
-            NSNumber *code = result[@"code"];
-            if (code.intValue == 0) { /// code == 0 命令执行成功
-                NSString *output = result[@"output"];
-                NSArray *resultArray = [output componentsSeparatedByString:@"\n"];
-                for (NSString *item in resultArray) {
-                    if ([item hasPrefix:@"*"]) {
-                        NSLog(@"%@ %@", code, item);
-                        branchInfo[obj] = [item substringFromIndex:1];
-                        break;
-                    }
+            
+            // 设置最大回溯层数为4
+            NSInteger maxDepth = 4;
+            
+            NSString *gitFolder = findGitFolder(workPath, maxDepth, 0);
+            
+            if (gitFolder) {
+                NSLog(@"Found .git folder in: %@", gitFolder);
+                
+                NSString *headContents = readHEADContents(gitFolder);
+                
+                if (headContents) {
+                    NSLog(@"Contents of HEAD file:\n%@", headContents);
+                    branchInfo[obj] = [headContents componentsSeparatedByString:@"/"].lastObject;
+                } else {
+                    NSLog(@"Failed to read HEAD file.");
                 }
+            } else {
+                NSLog(@".git folder not found within the specified depth limit.");
             }
+            
+//            SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
+//            NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
+//            NSLog(@"dacaiguoguogit:%@ %@", workPath, result);
+//            NSNumber *code = result[@"code"];
+//            if (code.intValue == 0) { /// code == 0 命令执行成功
+//                NSString *output = result[@"output"];
+//                NSArray *resultArray = [output componentsSeparatedByString:@"\n"];
+//                for (NSString *item in resultArray) {
+//                    if ([item hasPrefix:@"*"]) {
+//                        NSLog(@"%@ %@", code, item);
+//                        branchInfo[obj] = [item substringFromIndex:1];
+//                        break;
+//                    }
+//                }
+//            }
         }];
         self.branchInfo = branchInfo;
         self.iconInfo = iconInfo;
