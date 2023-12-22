@@ -30,8 +30,9 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    homePath = NSHomeDirectory();
+    NSString *username = NSUserName();
+
+    homePath = [NSString stringWithFormat:@"/Users/%@", username];
     
     // Remove unnecessary user defaults
     // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
@@ -66,8 +67,9 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
     self.navigationItem.rightBarButtonItems = @[refreshButton, devButton, fileButton];
     
     // Check and access the security-scoped resource for the developer folder
-    NSURL *docURL = [self resolveBookmarkDataOfKey:@"Developer"];
-    [docURL startAccessingSecurityScopedResource];
+    NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
+    homePath = developerURL.path;
+    [developerURL startAccessingSecurityScopedResource];
 }
 
 - (NSURL *)resolveBookmarkDataOfKey:(NSString *)key {
@@ -296,6 +298,7 @@ static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
     NSString *orgPath = self.recentListArray[indexPath.row];
     NSString *path = [orgPath stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
     cell.pathLabel.text = path;
+    cell.path = orgPath;
     NSString *branchName = self.branchInfo[orgPath];
     cell.branchLabel.text = branchName;
     cell.iconImageView.image = self.iconInfo[orgPath]?:[UIImage imageNamed:@"XcodeIcon"];

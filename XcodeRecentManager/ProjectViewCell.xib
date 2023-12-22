@@ -18,7 +18,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3wy-NV-EJe">
-                        <rect key="frame" x="75" y="18.5" width="84" height="26.5"/>
+                        <rect key="frame" x="75" y="18.5" width="35" height="26.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="22"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -38,17 +38,30 @@
                             <constraint firstAttribute="width" secondItem="Yvi-FM-fQX" secondAttribute="height" multiplier="1:1" id="Buv-Jw-24I"/>
                         </constraints>
                     </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qjJ-vP-YEQ">
+                        <rect key="frame" x="118" y="14" width="59" height="35"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="59" id="HTa-4C-lmb"/>
+                        </constraints>
+                        <state key="normal" title="Button"/>
+                        <buttonConfiguration key="configuration" style="plain" title="访达"/>
+                        <connections>
+                            <action selector="fangda:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="6Cj-ju-EC6"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="3wy-NV-EJe" firstAttribute="leading" secondItem="Yvi-FM-fQX" secondAttribute="trailing" constant="10" id="2oN-sZ-JJC"/>
+                    <constraint firstItem="qjJ-vP-YEQ" firstAttribute="leading" secondItem="3wy-NV-EJe" secondAttribute="trailing" constant="8" symbolic="YES" id="Fvx-gh-F8a"/>
                     <constraint firstItem="0bG-pI-Hbo" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="PbM-pm-3Ez"/>
+                    <constraint firstItem="qjJ-vP-YEQ" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="TeH-sz-zL9"/>
                     <constraint firstItem="3wy-NV-EJe" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="XfS-Vm-buP"/>
                     <constraint firstAttribute="trailingMargin" secondItem="0bG-pI-Hbo" secondAttribute="trailing" constant="10" id="dPm-Fm-R3C"/>
                     <constraint firstItem="Yvi-FM-fQX" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="fRc-BU-Pob"/>
                     <constraint firstAttribute="bottom" secondItem="Yvi-FM-fQX" secondAttribute="bottom" constant="4" id="goU-Y5-bOT"/>
+                    <constraint firstItem="0bG-pI-Hbo" firstAttribute="leading" secondItem="qjJ-vP-YEQ" secondAttribute="trailing" constant="-8" id="hnE-R4-YD1"/>
                     <constraint firstItem="Yvi-FM-fQX" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="kCk-mc-8wT"/>
                     <constraint firstItem="Yvi-FM-fQX" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="mLd-nU-vcT"/>
-                    <constraint firstItem="0bG-pI-Hbo" firstAttribute="leading" secondItem="3wy-NV-EJe" secondAttribute="trailing" constant="10" id="tT7-aZ-dob"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>

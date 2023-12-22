@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) IBOutlet UILabel *pathLabel;
 @property (strong, nonatomic) IBOutlet UILabel *branchLabel;
 @property (strong, nonatomic) IBOutlet UIImageView *iconImageView;
+@property (strong, nonatomic) NSString *path;
 
 @end
 
