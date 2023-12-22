@@ -97,7 +97,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     UIBarButtonItem *fileButton = [[UIBarButtonItem alloc] initWithTitle:@"授权历史文件夹"
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
-                                                                  action:@selector(openSystemPreferences:)];
+                                                                  action:@selector(showApplicationRecentDocuments:)];
     [fileButton setTintColor:UIColor.systemBlueColor];
     self.navigationItem.rightBarButtonItems = @[refreshButton, devButton, fileButton];
     
@@ -168,7 +168,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     UIAlertAction *grantAction = [UIAlertAction actionWithTitle:@"现在授予"
                                                           style:UIAlertActionStyleDefault
                                                         handler:^(UIAlertAction * _Nonnull action) {
-        [self openSystemPreferences:nil];
+        [self showApplicationRecentDocuments:nil];
     }];
     
     UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后再说"
@@ -190,7 +190,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
         [alert addAction:[UIAlertAction actionWithTitle:@"OK"
                                                   style:UIAlertActionStyleDefault
                                                 handler:^(UIAlertAction * _Nonnull action) {
-            [self openSystemPreferences:nil];
+            [self showApplicationRecentDocuments:nil];
         }]];
         
         [self presentViewController:alert animated:YES completion:nil];
@@ -303,7 +303,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     }
 }
 
-- (void)openSystemPreferences:(id)sender {
+- (void)showApplicationRecentDocuments:(id)sender {
     NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
     NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
     [bundle load];
