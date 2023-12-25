@@ -33,8 +33,8 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     
     NSError *error;
     NSString *headContents = [NSString stringWithContentsOfFile:headPath
-                                                      encoding:NSUTF8StringEncoding
-                                                         error:&error];
+                                                       encoding:NSUTF8StringEncoding
+                                                          error:&error];
     
     if (error) {
         NSLog(@"Error reading HEAD file: %@", error.localizedDescription);
@@ -63,19 +63,20 @@ NSString *readHEADContents(NSString *gitFolderPath) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.backgroundColor = UIColor.clearColor;
     // Remove unnecessary user defaults
     // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
     // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
-
+    
     NSString *username = NSUserName();
-
+    
     homePath = [NSString stringWithFormat:@"/Users/%@", username];
     // Check and access the security-scoped resource for the developer folder
     NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
     if(developerURL) {
         homePath = developerURL.path;
     }
-
+    
     self.title = @"Open Recent";
     
     // Register the nib for the table view
@@ -104,7 +105,37 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     [fileButton setTintColor:UIColor.systemBlueColor];
     self.navigationItem.rightBarButtonItems = @[refreshButton, devButton, fileButton];
     
+    // 创建一个UILabel
+    UILabel *hintLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    hintLabel.text = @"请点击<授权历史文件夹>按钮，确认路径是\n\"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments\"，\n要显示git分支信息，请点击<选择开发者文件夹>";
+    hintLabel.numberOfLines = 0; // 允许多行
+    hintLabel.textAlignment = NSTextAlignmentCenter;
+    hintLabel.textColor = [UIColor blackColor];
+    
+    // 设置UILabel的约束，使其在视图中央
+    hintLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:hintLabel];
+    [self.view insertSubview:hintLabel atIndex:0];
 
+    NSLayoutConstraint *centerXConstraint = [NSLayoutConstraint constraintWithItem:hintLabel
+                                                                         attribute:NSLayoutAttributeCenterX
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:self.view
+                                                                         attribute:NSLayoutAttributeCenterX
+                                                                        multiplier:1.0
+                                                                          constant:0.0];
+    
+    NSLayoutConstraint *centerYConstraint = [NSLayoutConstraint constraintWithItem:hintLabel
+                                                                         attribute:NSLayoutAttributeCenterY
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:self.view
+                                                                         attribute:NSLayoutAttributeCenterY
+                                                                        multiplier:1.0
+                                                                          constant:0.0];
+    
+    // 添加约束
+    [self.view addConstraints:@[centerXConstraint, centerYConstraint]];
+    
 }
 
 - (NSURL *)resolveBookmarkDataOfKey:(NSString *)key {
@@ -116,7 +147,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
                                         relativeToURL:nil
                                   bookmarkDataIsStale:&isStale
                                                 error:nil];
-    [docURL stopAccessingSecurityScopedResource];
+    // [docURL stopAccessingSecurityScopedResource];
     if (isStale) {
         NSData *savedata = [docURL bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
                             includingResourceValuesForKeys:nil
@@ -124,7 +155,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
                                                      error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:key];
     }
-    // [docURL startAccessingSecurityScopedResource];
+    [docURL startAccessingSecurityScopedResource];
     return docURL;
 }
 
@@ -201,7 +232,9 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     }
     
     self.recentListArray = readSflWithFile(filePath);
-    
+    // TODO: .Trash 路径排除
+    self.tableView.backgroundColor = UIColor.whiteColor;
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         //#if TARGET_OS_MACCATALYST
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -240,12 +273,12 @@ NSString *readHEADContents(NSString *gitFolderPath) {
             NSString *gitFolder = findGitFolder(workPath, maxDepth, 0);
             
             if (gitFolder) {
-                NSLog(@"Found .git folder in: %@", gitFolder);
+                // NSLog(@"Found .git folder in: %@", gitFolder);
                 
                 NSString *headContents = readHEADContents(gitFolder);
                 
                 if (headContents) {
-                    NSLog(@"Contents of HEAD file:\n%@", headContents);
+                    // NSLog(@"Contents of HEAD file:\n%@", headContents);
                     branchInfo[obj] = [headContents componentsSeparatedByString:@"/"].lastObject;
                 } else {
                     NSLog(@"Failed to read HEAD file.");
@@ -254,21 +287,21 @@ NSString *readHEADContents(NSString *gitFolderPath) {
                 NSLog(@".git folder not found within the specified depth limit.");
             }
             
-//            SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
-//            NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
-//            NSLog(@"dacaiguoguogit:%@ %@", workPath, result);
-//            NSNumber *code = result[@"code"];
-//            if (code.intValue == 0) { /// code == 0 命令执行成功
-//                NSString *output = result[@"output"];
-//                NSArray *resultArray = [output componentsSeparatedByString:@"\n"];
-//                for (NSString *item in resultArray) {
-//                    if ([item hasPrefix:@"*"]) {
-//                        NSLog(@"%@ %@", code, item);
-//                        branchInfo[obj] = [item substringFromIndex:1];
-//                        break;
-//                    }
-//                }
-//            }
+            //            SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
+            //            NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
+            //            NSLog(@"dacaiguoguogit:%@ %@", workPath, result);
+            //            NSNumber *code = result[@"code"];
+            //            if (code.intValue == 0) { /// code == 0 命令执行成功
+            //                NSString *output = result[@"output"];
+            //                NSArray *resultArray = [output componentsSeparatedByString:@"\n"];
+            //                for (NSString *item in resultArray) {
+            //                    if ([item hasPrefix:@"*"]) {
+            //                        NSLog(@"%@ %@", code, item);
+            //                        branchInfo[obj] = [item substringFromIndex:1];
+            //                        break;
+            //                    }
+            //                }
+            //            }
         }];
         self.branchInfo = branchInfo;
         self.iconInfo = iconInfo;
@@ -312,16 +345,16 @@ NSString *readHEADContents(NSString *gitFolderPath) {
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
         [self loadData];
     } else {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"文件夹路径错误"
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"授权文件夹路径错误"
                                                                                  message:@"请确认是\"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments\"，再次点击<授权历史文件夹>按钮"
                                                                           preferredStyle:UIAlertControllerStyleAlert];
-
+        
         UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"我知道了"
                                                               style:UIAlertActionStyleCancel
                                                             handler:nil];
-
+        
         [alertController addAction:laterAction];
-
+        
         [self presentViewController:alertController animated:YES completion:nil];
     }
     
