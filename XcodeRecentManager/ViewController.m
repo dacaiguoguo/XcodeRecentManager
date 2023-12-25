@@ -63,16 +63,19 @@ NSString *readHEADContents(NSString *gitFolderPath) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    // Remove unnecessary user defaults
+    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
+    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
+
     NSString *username = NSUserName();
 
     homePath = [NSString stringWithFormat:@"/Users/%@", username];
     // Check and access the security-scoped resource for the developer folder
     NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
-    homePath = developerURL.path;
-    // Remove unnecessary user defaults
-    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
-    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
-    
+    if(developerURL) {
+        homePath = developerURL.path;
+    }
+
     self.title = @"Open Recent";
     
     // Register the nib for the table view
@@ -113,7 +116,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
                                         relativeToURL:nil
                                   bookmarkDataIsStale:&isStale
                                                 error:nil];
-    
+    [docURL stopAccessingSecurityScopedResource];
     if (isStale) {
         NSData *savedata = [docURL bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
                             includingResourceValuesForKeys:nil
@@ -121,7 +124,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
                                                      error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:key];
     }
-    [docURL startAccessingSecurityScopedResource];
+    // [docURL startAccessingSecurityScopedResource];
     return docURL;
 }
 
@@ -183,17 +186,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
 
 - (void)handleReadFileError {
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"读取失败"
-                                                                       message:@"请授予文件夹访问权限"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alert addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction * _Nonnull action) {
-            [self showApplicationRecentDocuments:nil];
-        }]];
-        
-        [self presentViewController:alert animated:YES completion:nil];
+        [self handleFileNotFound];
     });
 }
 
@@ -314,10 +307,22 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     SEL selector = NSSelectorFromString(@"selectFolderBtnClicked:");
     NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments".stringByStandardizingPath;
     NSURL *docurl = [principalClass performSelector:selector withObject:documentPath];
-    if (docurl) {
+    if ([docurl.path.lastPathComponent isEqualToString:@"com.apple.LSSharedFileList.ApplicationRecentDocuments"]) {
         NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
         [self loadData];
+    } else {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"文件夹路径错误"
+                                                                                 message:@"请确认是\"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments\"，再次点击<授权历史文件夹>按钮"
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+
+        UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"我知道了"
+                                                              style:UIAlertActionStyleCancel
+                                                            handler:nil];
+
+        [alertController addAction:laterAction];
+
+        [self presentViewController:alertController animated:YES completion:nil];
     }
     
     //    SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
