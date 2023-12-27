@@ -17,6 +17,7 @@
 - (IBAction)fangda:(UIButton *)sender {
     NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
     NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
+
     [bundle load];
     Class principalClass = bundle.principalClass;
     SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
