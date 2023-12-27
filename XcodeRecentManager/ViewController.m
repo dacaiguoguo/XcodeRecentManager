@@ -10,6 +10,8 @@
 #import "ProjectViewCell.h"
 static NSString * const kApplicationRecentDocumentsKey = @"ApplicationRecentDocuments";
 static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
+static NSString * const kXcodeSFLFileName2 = @"com.apple.dt.xcode.sfl2";
+static NSString * const kXcodeSFLFileDoc = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments";
 
 #import <Foundation/Foundation.h>
 
@@ -61,12 +63,20 @@ NSString *readHEADContents(NSString *gitFolderPath) {
 
 @implementation ViewController
 
+- (void)cleanSave:(id)sender {
+    // Remove unnecessary user defaults
+     [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
+     [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
+    NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
+    [developerURL stopAccessingSecurityScopedResource];
+    NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
+    [docURL stopAccessingSecurityScopedResource];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.backgroundColor = UIColor.clearColor;
-    // Remove unnecessary user defaults
-    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
-    // [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
+
     
     NSString *username = NSUserName();
     
@@ -103,11 +113,17 @@ NSString *readHEADContents(NSString *gitFolderPath) {
                                                                   target:self
                                                                   action:@selector(showApplicationRecentDocuments:)];
     [fileButton setTintColor:UIColor.systemBlueColor];
-    self.navigationItem.rightBarButtonItems = @[refreshButton, devButton, fileButton];
     
+    UIBarButtonItem *cleanButton = [[UIBarButtonItem alloc] initWithTitle:@"授权重置"
+                                                                   style:UIBarButtonItemStylePlain
+                                                                  target:self
+                                                                  action:@selector(cleanSave:)];
+    [cleanButton setTintColor:UIColor.systemBlueColor];
+    self.navigationItem.rightBarButtonItems = @[refreshButton, devButton, fileButton];
+    self.navigationItem.leftBarButtonItem  = cleanButton;
     // 创建一个UILabel
     UILabel *hintLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    hintLabel.text = @"请点击<授权历史文件夹>按钮，确认路径是\n\"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments\"，\n要显示git分支信息，请点击<选择开发者文件夹>";
+    hintLabel.text = [NSString stringWithFormat:@"请点击<授权历史文件夹>按钮，确认路径是\n\"%@\"，\n要显示git分支信息，请点击<选择开发者文件夹>", kXcodeSFLFileDoc];
     hintLabel.numberOfLines = 0; // 允许多行
     hintLabel.textAlignment = NSTextAlignmentCenter;
     hintLabel.textColor = [UIColor blackColor];
@@ -116,7 +132,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     hintLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:hintLabel];
     [self.view insertSubview:hintLabel atIndex:0];
-
+    
     NSLayoutConstraint *centerXConstraint = [NSLayoutConstraint constraintWithItem:hintLabel
                                                                          attribute:NSLayoutAttributeCenterX
                                                                          relatedBy:NSLayoutRelationEqual
@@ -183,7 +199,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     NSString *filePath = [documentPath stringByAppendingPathComponent:kXcodeSFLFileName];
     
     if (![fileManager fileExistsAtPath:filePath]) {
-        NSString *oldFilePath = [documentPath stringByAppendingPathComponent:@"com.apple.dt.xcode.sfl2"];
+        NSString *oldFilePath = [documentPath stringByAppendingPathComponent:kXcodeSFLFileName2];
         if ([fileManager fileExistsAtPath:oldFilePath]) {
             filePath = oldFilePath;
         } else {
@@ -195,21 +211,15 @@ NSString *readHEADContents(NSString *gitFolderPath) {
 }
 
 - (void)handleFileNotFound {
+    NSString *message = [NSString stringWithFormat:@"如果已经授权，请确认\"%@\"，文件夹下是否存在%@或者%@", kXcodeSFLFileDoc,kXcodeSFLFileName, kXcodeSFLFileName2];
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"未获取到记录文件"
-                                                                             message:@"请授予文件夹访问权限"
+                                                                             message:@""
                                                                       preferredStyle:UIAlertControllerStyleAlert];
     
-    UIAlertAction *grantAction = [UIAlertAction actionWithTitle:@"现在授予"
-                                                          style:UIAlertActionStyleDefault
-                                                        handler:^(UIAlertAction * _Nonnull action) {
-        [self showApplicationRecentDocuments:nil];
-    }];
-    
-    UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"稍后再说"
+    UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"我知道了"
                                                           style:UIAlertActionStyleCancel
                                                         handler:nil];
     
-    [alertController addAction:grantAction];
     [alertController addAction:laterAction];
     
     [self presentViewController:alertController animated:YES completion:nil];
@@ -234,7 +244,7 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     self.recentListArray = readSflWithFile(filePath);
     // TODO: .Trash 路径排除
     self.tableView.backgroundColor = UIColor.whiteColor;
-
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         //#if TARGET_OS_MACCATALYST
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -338,15 +348,17 @@ NSString *readHEADContents(NSString *gitFolderPath) {
     // This is set in MacTask/Info.plist
     Class principalClass = bundle.principalClass;
     SEL selector = NSSelectorFromString(@"selectFolderBtnClicked:");
-    NSString *documentPath = @"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments".stringByStandardizingPath;
+    NSString *documentPath = kXcodeSFLFileDoc.stringByStandardizingPath;
     NSURL *docurl = [principalClass performSelector:selector withObject:documentPath];
     if ([docurl.path.lastPathComponent isEqualToString:@"com.apple.LSSharedFileList.ApplicationRecentDocuments"]) {
         NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
         [self loadData];
     } else {
+        NSString *message = [NSString stringWithFormat:@"请确认是\"%@\"，再次点击<授权历史文件夹>按钮", kXcodeSFLFileDoc];
+        
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"授权文件夹路径错误"
-                                                                                 message:@"请确认是\"~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments\"，再次点击<授权历史文件夹>按钮"
+                                                                                 message:message
                                                                           preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"我知道了"
