@@ -92,7 +92,6 @@ NSString * readHEADContents(NSString *gitFolderPath) {
     // Register the nib for the table view
     [self.tableView registerNib:[UINib nibWithNibName:@"ProjectViewCell" bundle:nil] forCellReuseIdentifier:@"ProjectViewCell"];
 
-    [self loadData];
 
     // Create and set up the "Refresh" button
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithTitle:@"刷新"
@@ -171,6 +170,9 @@ NSString * readHEADContents(NSString *gitFolderPath) {
 
     // 添加约束
     [self.view addConstraints:@[centerXConstraint, centerYConstraint, widthConstraint, heightConstraint]];
+    
+    [self loadData];
+
 
 } /* viewDidLoad */
 
