@@ -64,13 +64,14 @@ NSString * readHEADContents(NSString *gitFolderPath) {
 @implementation ViewController
 
 - (void)cleanSave:(id)sender {
-    // Remove unnecessary user defaults
-    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
-    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
+ 
     NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
     [developerURL stopAccessingSecurityScopedResource];
     NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
     [docURL stopAccessingSecurityScopedResource];
+    // Remove unnecessary user defaults
+    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Developer"];
+    [NSUserDefaults.standardUserDefaults removeObjectForKey:@"ApplicationRecentDocuments"];
 }
 
 - (void)viewDidLoad {
@@ -206,7 +207,29 @@ NSString * readHEADContents(NSString *gitFolderPath) {
 
 - (void)loadData {
     NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
+    if (!docURL) {
 
+        
+        NSString *message = [NSString stringWithFormat:@"如果已经授权，请确认\"%@\"，文件夹下是否存在%@或者%@", kXcodeSFLFileDoc, kXcodeSFLFileName, kXcodeSFLFileName2];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"未获取到记录文件"
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *grantAction = [UIAlertAction actionWithTitle:@"现在授予"
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction * _Nonnull action) {
+            [self showApplicationRecentDocuments:nil];
+        }];
+        
+        UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"我知道了"
+                                                              style:UIAlertActionStyleCancel
+                                                            handler:nil];
+        [alertController addAction:grantAction];
+
+        [alertController addAction:laterAction];
+
+        [self presentViewController:alertController animated:YES completion:nil];
+        return;
+    }
     NSString *filePath = [self filePathForDocumentPath:docURL.path];
 
     if (!filePath) {
@@ -374,12 +397,13 @@ NSString * readHEADContents(NSString *gitFolderPath) {
     Class principalClass = bundle.principalClass;
     SEL selector = NSSelectorFromString(@"selectFolderBtnClicked:");
     NSString *documentPath = kXcodeSFLFileDoc.stringByStandardizingPath;
+    NSLog(@"gettingdocumentPath:%@", documentPath);
     NSURL *docurl = [principalClass performSelector:selector withObject:documentPath];
     if ([docurl.path.lastPathComponent isEqualToString:@"com.apple.LSSharedFileList.ApplicationRecentDocuments"]) {
         NSData *savedata = [docurl bookmarkDataWithOptions:NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
         [NSUserDefaults.standardUserDefaults setObject:savedata forKey:@"ApplicationRecentDocuments"];
         [self loadData];
-    } else {
+    } else if(docurl.path.length > 0) {
         NSString *message = [NSString stringWithFormat:@"请确认是\"%@\"，再次点击<授权历史文件夹>按钮", kXcodeSFLFileDoc];
 
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"授权文件夹路径错误"
