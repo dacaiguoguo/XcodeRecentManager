@@ -2,7 +2,7 @@
 Xcode Recent Items Manager Xcode 最近打开文件列表管理工具    
 Mac app store 已经上线，由于沙盒限制，操作略显繁琐，需要授权两个文件夹  
 1、历史记录文件夹。  
-2、工程所在文件夹，一般建议在用户目录下创建Developer，然后拖到Finder侧边栏，这样还有个小锤子呢    
+2、工程所在文件夹，一般建议在用户目录下创建Developer(所有工程都放在这里面)，然后拖到Finder侧边栏，这样还有个小锤子呢    
 
 <img width="151" alt="image" src="https://github.com/dacaiguoguo/XcodeRecentManager/assets/2638446/72cee3cf-5b1d-4f58-a1fe-9d77e7ad5e11">
 
