@@ -30,7 +30,7 @@ NSArray* readSflWithFile(NSString *filePath) {
         return nil;
     }
     
-    if (!recentList || recentList.count == 0) {
+    if (!recentList) {
         return nil;
     }
 
