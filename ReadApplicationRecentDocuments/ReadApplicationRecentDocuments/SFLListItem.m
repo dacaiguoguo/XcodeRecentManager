@@ -6,53 +6,53 @@
 //
 
 #import "SFLListItem.h"
-// com.apple.finder.sfl 需要测试
 NSArray* readSflWithFile(NSString *filePath) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL isExist = [fileManager fileExistsAtPath:filePath];
-    if (!isExist) {
+    if (![fileManager fileExistsAtPath:filePath]) {
         return nil;
     }
+    
     NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
     NSError *err = nil;
-    NSData *data = [[NSData alloc] initWithContentsOfURL:fileUrl options:(NSDataReadingMappedIfSafe) error:&err];
+    NSData *data = [NSData dataWithContentsOfURL:fileUrl options:NSDataReadingMappedIfSafe error:&err];
+    
     if (err || data == nil) {
-        NSLog(@"%@",err.localizedDescription);
+        NSLog(@"%@", err.localizedDescription);
         return nil;
     }
-    NSDictionary *recentListInfo = [NSKeyedUnarchiver unarchiveTopLevelObjectWithData:data error:&err];
-    NSArray *recentList = recentListInfo[@"items"];
-
-    NSMutableArray *mutArray = [NSMutableArray array];
-    if ([recentList.firstObject isKindOfClass:NSDictionary.class]) {
-        [recentList enumerateObjectsUsingBlock:^(NSDictionary *bookmarkInfo, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSData *bookmark = bookmarkInfo[@"Bookmark"];
-            NSError *resolveError = nil;
-            NSURL *resolvedUrl = [NSURL URLByResolvingBookmarkData:bookmark options:(NSURLBookmarkResolutionWithoutUI) relativeToURL:nil bookmarkDataIsStale:nil error:&resolveError];
-            if (resolvedUrl == nil) {
-                // NSLog(@"%@",@"null");
-                return;
-            }
-            // NSLog(@"%@",resolvedUrl.path);
-            [mutArray addObject:resolvedUrl.path];
-
-        }];
-    } else if ([recentList.firstObject isKindOfClass:SFLListItem.class]) {
-        [recentList enumerateObjectsUsingBlock:^(SFLListItem *bookmarkInfo, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSURL *resolvedUrl = bookmarkInfo.URL;
-            if (resolvedUrl == nil) {
-                // NSLog(@"%@",@"null");
-                return;
-            }
-            // NSLog(@"%@",resolvedUrl.path);
-            [mutArray addObject:resolvedUrl.path];
-
-        }];
+    
+    NSArray *recentList;
+    @try {
+        NSDictionary *recentListInfo = [NSKeyedUnarchiver unarchiveTopLevelObjectWithData:data error:&err];
+        recentList = recentListInfo[@"items"];
+    } @catch (NSException *exception) {
+        NSLog(@"Exception during unarchiving: %@", exception);
+        return nil;
+    }
+    
+    if (!recentList || recentList.count == 0) {
+        return nil;
     }
 
+    NSMutableArray *mutArray = [NSMutableArray array];
+    
+    for (id item in recentList) {
+        NSURL *resolvedUrl;
+        
+        if ([item isKindOfClass:NSDictionary.class]) {
+            NSData *bookmark = item[@"Bookmark"];
+            NSError *resolveError = nil;
+            resolvedUrl = [NSURL URLByResolvingBookmarkData:bookmark options:NSURLBookmarkResolutionWithoutUI relativeToURL:nil bookmarkDataIsStale:nil error:&resolveError];
+        } else if ([item isKindOfClass:SFLListItem.class]) {
+            resolvedUrl = ((SFLListItem *)item).URL;
+        }
 
-    // NSLog(@"%@", mutArray);
-    return mutArray.copy;;
+        if (resolvedUrl) {
+            [mutArray addObject:resolvedUrl.path];
+        }
+    }
+
+    return mutArray.copy;
 }
 
 @implementation SFLListItem
