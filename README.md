@@ -17,4 +17,11 @@ Mac app store :  https://apps.apple.com/cn/app/xcoderecentmanager/id6474598237
 
 ![Size2](permission.png)
 
+### Todo:
+1. 支持更多开发者文件夹选择，也就是增加一个列表，应该用户的目录可能有多个，例如~/developer 和~/download等
+2. 数据持久化，每次读取进行存储，而不只是读取
+3. 支持文件变更监控，自动更新
+4. 支持更多app的最近打开文件列表
+5. 支持删除和修改顺序
+
 

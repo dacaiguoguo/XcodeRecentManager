@@ -59,6 +59,7 @@
 		5B16F0B42B3527A200BA6F21 /* SwiftTool.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftTool.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B16F0C22B352ACD00BA6F21 /* LVTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVTask.h; sourceTree = "<group>"; };
 		5B16F0C32B352ACD00BA6F21 /* LVTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVTask.m; sourceTree = "<group>"; };
+		5B2BD9872B43A39D002BE999 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		9D0A61E326B143B80069D967 /* XcodeRecentManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XcodeRecentManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0A61E626B143B80069D967 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9D0A61E726B143B80069D967 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -132,6 +133,7 @@
 				9D15C89C26CCABDC003154B6 /* SFLListItem.m */,
 				5B16F0C22B352ACD00BA6F21 /* LVTask.h */,
 				5B16F0C32B352ACD00BA6F21 /* LVTask.m */,
+				5B2BD9872B43A39D002BE999 /* README.md */,
 				9D0A61EF26B143B80069D967 /* Main.storyboard */,
 				9D0A61F226B143BB0069D967 /* Assets.xcassets */,
 				9D0A61F426B143BB0069D967 /* LaunchScreen.storyboard */,
