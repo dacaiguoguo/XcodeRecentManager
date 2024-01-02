@@ -18,6 +18,13 @@
     return self;
 }
 
++ (void)openURLs:(NSArray<NSURL *> *)urls appUrl:(NSURL *)appurl {
+    NSWorkspaceOpenConfiguration *config = NSWorkspaceOpenConfiguration.configuration;
+    [NSWorkspace.sharedWorkspace openURLs:urls withApplicationAtURL:appurl configuration:config completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+        NSLog(@"NSRunningApplication:%@", app);
+    }];
+}
+
 + (NSDictionary *)runShell:(NSArray<NSString *> *)arguments workingDirectory:(NSURL *)workingDir {
     NSTask *task = [[NSTask alloc] init];
 

@@ -46,6 +46,23 @@ NSString * readHEADContents(NSString *gitFolderPath) {
     return headContents;
 }
 
+
+NSURL *replaceSchemeWithXcodeScheme(NSURL *originalURL) {
+    NSURLComponents *components = [NSURLComponents componentsWithURL:originalURL resolvingAgainstBaseURL:NO];
+
+    // 替换scheme为"xcode"
+    components.scheme = @"xcode";
+
+    // 创建替换后的URL
+    NSURL *modifiedURL = components.URL;
+    
+    return modifiedURL;
+}
+
+
+
+
+
 // #if TARGET_OS_MACCATALYST
 
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource> {
@@ -454,11 +471,40 @@ NSString * readHEADContents(NSString *gitFolderPath) {
 #pragma tableView--UITableViewDelegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *orgPath = self.recentListArray[indexPath.row];
-    NSURL *aUrl = [NSURL fileURLWithPath:orgPath];
+    NSURL *xcodeURL = [NSURL fileURLWithPath:orgPath];
+//    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
+//    NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
+//
+//    [bundle load];
+//
+//    // Load the principal class from the bundle
+//    // This is set in MacTask/Info.plist
+//    Class principalClass = bundle.principalClass;
+//    SEL selector = NSSelectorFromString(@"openURLs:appUrl:");
+//    [principalClass performSelector:selector withObject:@[xcodeURL] withObject:[NSURL fileURLWithPath:@"/Applications/Xcode.app"]];
 
-    [[UIApplication sharedApplication] openURL:aUrl options:@{} completionHandler:^(BOOL success) {
+//    xcode
+    // 示例用法
+//    NSURL *xcodeURL = replaceSchemeWithXcodeScheme(aUrl);
+//    NSLog(@"xcodeURL:%@", xcodeURL);
+    [[UIApplication sharedApplication] openURL:xcodeURL options:@{} completionHandler:^(BOOL success) {
          NSLog(@"%@", @(success));
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        if (!success) {
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"打开失败，请检查权限"
+                                                                                     message:nil
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *laterAction = [UIAlertAction actionWithTitle:@"我知道了"
+                                                                  style:UIAlertActionStyleCancel
+                                                                handler:nil];
+
+            [alertController addAction:laterAction];
+
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
      }];
 }
 
 @end
+
