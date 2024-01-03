@@ -7,6 +7,7 @@
 
 #import "ViewController.h"
 #import "SFLListItem.h"
+#import "JsonViewController.h"
 #import "ProjectViewCell.h"
 static NSString * const kApplicationRecentDocumentsKey = @"ApplicationRecentDocuments";
 static NSString * const kXcodeSFLFileName = @"com.apple.dt.xcode.sfl3";
@@ -60,6 +61,57 @@ NSURL *replaceSchemeWithXcodeScheme(NSURL *originalURL) {
 }
 
 
+NSString *stringToHex(NSString *inputString) {
+    // 将字符串转换为 UTF-8 编码的 NSData
+    NSData *data = [inputString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    // 获取 NSData 中的字节数组
+    const uint8_t *bytes = [data bytes];
+    
+    // 用于存储结果的可变字符串
+    NSMutableString *hexString = [NSMutableString stringWithCapacity:[data length] * 2];
+    
+    // 遍历字节数组，将每个字节转换为十六进制表示
+    for (NSInteger i = 0; i < [data length]; i++) {
+        [hexString appendFormat:@"%02X ", bytes[i]];
+    }
+    
+    return hexString.lowercaseString;
+}
+
+
+NSArray<NSURL *> *readURLsFromFile(NSString *filePath) {
+    // 从文件中读取字符串数组
+    NSArray *stringURLs = [NSArray arrayWithContentsOfFile:filePath];
+    
+    if (stringURLs == nil) {
+        NSLog(@"Failed to read array from file at path: %@", filePath);
+        return @[];
+    }    
+    return stringURLs;
+}
+
+
+NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSArray<NSString *> *secondArray) {
+    
+
+    // 转换为按第一个数组顺序排序的数组
+    NSMutableArray<NSString *> *sortedArray = [NSMutableArray arrayWithArray:firstArray];
+    for (NSString *url in secondArray) {
+        BOOL has = NO;
+        for (NSString *url2 in firstArray) {
+            if ([url2 isEqualToString:url]) {
+                has = YES;
+                break;
+            }
+        }
+        if (!has) {
+            [sortedArray addObject:url];
+        }
+    }
+
+    return [sortedArray copy];
+}
 
 
 
@@ -81,7 +133,8 @@ NSURL *replaceSchemeWithXcodeScheme(NSURL *originalURL) {
 @implementation ViewController
 
 - (void)cleanSave:(id)sender {
- 
+//    JsonViewController *jvc = [[JsonViewController alloc] init];
+//    [self.navigationController pushViewController:jvc animated:YES];
     NSURL *developerURL = [self resolveBookmarkDataOfKey:@"Developer"];
     [developerURL stopAccessingSecurityScopedResource];
     NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
@@ -93,6 +146,11 @@ NSURL *replaceSchemeWithXcodeScheme(NSURL *originalURL) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //    NSString *outpou = stringToHex(@"com.apple.Terminal");
+    // 63 6f 6d 2e 61 70 70 6c 65 2e 54 65 72 6d 69 6e 61 6c
+    // 64 65 76 2e 77 61 72 70 2e 57 61 72 70 2d 53 74 61 62 6c 65
+    //    NSString *outpou = stringToHex(@"dev.warp.Warp-Stable");
+    //    NSLog(@"%@", outpou);
     self.tableView.backgroundColor = UIColor.clearColor;
 
 
@@ -303,8 +361,15 @@ NSURL *replaceSchemeWithXcodeScheme(NSURL *originalURL) {
         [self handleReadFileError];
         return;
     }
-
-    self.recentListArray = readSflWithFile(filePath);
+    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *filePath2 = [documentsDirectory stringByAppendingPathComponent:@"recentListArray.plist"];
+    NSArray *temp = readURLsFromFile(filePath2);
+    NSArray *temp2 = readSflWithFile(filePath);
+    self.recentListArray = mergeAndSortURLArrays(temp2, temp);
+    // 获取文件路径，这里假设要保存到用户的文档目录下
+    [NSFileManager.defaultManager removeItemAtPath:filePath2 error:nil];
+    NSError *err = nil;
+    BOOL ret = [self.recentListArray writeToURL:[NSURL fileURLWithPath:filePath2] error:&err];
     // TODO: .Trash 路径排除
     self.hintLabel.hidden = YES;
 
@@ -457,9 +522,9 @@ NSURL *replaceSchemeWithXcodeScheme(NSURL *originalURL) {
     static NSString *identifier = @"ProjectViewCell";
     ProjectViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
     NSString *orgPath = self.recentListArray[indexPath.row];
-    NSString *path = [orgPath stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
+//    NSString *path = [orgPath stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
 
-    cell.pathLabel.text = path;
+    cell.pathLabel.text = orgPath;
     cell.path = orgPath;
     NSString *branchName = self.branchInfo[orgPath];
     cell.branchLabel.text = branchName;
