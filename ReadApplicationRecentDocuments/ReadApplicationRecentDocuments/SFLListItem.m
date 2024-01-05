@@ -20,6 +20,15 @@ NSArray* readSflWithFile(NSString *filePath) {
         NSLog(@"%@", err.localizedDescription);
         return nil;
     }
+    return readSflWithData(data);
+}
+
+NSArray* readSflWithData(NSData *data) {
+    NSError *err = nil;
+
+    if (data == nil) {
+        return nil;
+    }
     
     NSArray *recentList;
     @try {
@@ -54,6 +63,7 @@ NSArray* readSflWithFile(NSString *filePath) {
 
     return mutArray.copy;
 }
+
 
 @implementation SFLListItem
 + (BOOL)supportsSecureCoding {

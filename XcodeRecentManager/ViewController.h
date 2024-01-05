@@ -8,6 +8,17 @@
 #import <UIKit/UIKit.h>
 
 
+#import <Foundation/Foundation.h>
+
+@interface NSMutableArray (UniqueAddition)
+
+- (void)addUniqueObject:(id)object;
+
+@end
+
+
+
+
 @interface ViewController : UIViewController
 
 @end

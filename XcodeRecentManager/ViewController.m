@@ -80,7 +80,7 @@ NSString *stringToHex(NSString *inputString) {
 }
 
 
-NSArray<NSURL *> *readURLsFromFile(NSString *filePath) {
+NSArray<NSString *> *readURLsFromFile(NSString *filePath) {
     // 从文件中读取字符串数组
     NSArray *stringURLs = [NSArray arrayWithContentsOfFile:filePath];
     
@@ -91,25 +91,25 @@ NSArray<NSURL *> *readURLsFromFile(NSString *filePath) {
     return stringURLs;
 }
 
+@implementation NSMutableArray (UniqueAddition)
+
+- (void)addUniqueObject:(id)object {
+    if (![self containsObject:object]) {
+        [self addObject:object];
+    }
+}
+
+@end
 
 NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSArray<NSString *> *secondArray) {
-    
-
-    // 转换为按第一个数组顺序排序的数组
     NSMutableArray<NSString *> *sortedArray = [NSMutableArray arrayWithArray:firstArray];
-    for (NSString *url in secondArray) {
-        BOOL has = NO;
-        for (NSString *url2 in firstArray) {
-            if ([url2 isEqualToString:url]) {
-                has = YES;
-                break;
-            }
-        }
-        if (!has) {
-            [sortedArray addObject:url];
-        }
-    }
-
+    [firstArray enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [sortedArray addUniqueObject:obj];
+    }];
+    [secondArray enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [sortedArray addUniqueObject:obj];
+    }];
+    
     return [sortedArray copy];
 }
 
@@ -353,23 +353,44 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
 }
 
 - (void)runWithFilePath:(NSString *)filePath {
+    // Use NSURLResourceKeyIsRegularFile to check if the file at the given URL is a regular file
     NSURL *fileURL = [NSURL fileURLWithPath:filePath];
-    NSError *error = nil;
-    NSData *data = [NSData dataWithContentsOfURL:fileURL options:NSDataReadingMappedIfSafe error:&error];
+    NSNumber *isRegularFile;
+    NSError *fileError = nil;
+    [fileURL getResourceValue:&isRegularFile forKey:NSURLIsRegularFileKey error:&fileError];
 
-    if (error || data == nil) {
+    if (fileError || ![isRegularFile boolValue]) {
         [self handleReadFileError];
         return;
     }
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
-    NSString *filePath2 = [documentsDirectory stringByAppendingPathComponent:@"recentListArray.plist"];
-    NSArray *temp = readURLsFromFile(filePath2);
-    NSArray *temp2 = readSflWithFile(filePath);
-    self.recentListArray = mergeAndSortURLArrays(temp2, temp);
-    // 获取文件路径，这里假设要保存到用户的文档目录下
-    [NSFileManager.defaultManager removeItemAtPath:filePath2 error:nil];
-    NSError *err = nil;
-    BOOL ret = [self.recentListArray writeToURL:[NSURL fileURLWithPath:filePath2] error:&err];
+
+    NSError *readError = nil;
+    NSData *data = [NSData dataWithContentsOfURL:fileURL options:NSDataReadingMappedIfSafe error:&readError];
+
+    if (readError || data == nil) {
+        [self handleReadFileError];
+        return;
+    }
+
+    // Use NSURL method to get the document directory
+    NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+    NSString *historyFilePath = [documentsDirectoryURL URLByAppendingPathComponent:@"recentListArray.plist"].path;
+
+    // Use NSURL method to read and write arrays to URLs
+    NSArray *historyInFile = [NSArray arrayWithContentsOfURL:[NSURL fileURLWithPath:historyFilePath]] ?: @[];
+    NSArray *xcodeHistory = readSflWithData(data) ?: @[];
+    self.recentListArray = mergeAndSortURLArrays(xcodeHistory, historyInFile);
+
+    // Use NSURL method to delete the file
+    [[NSFileManager defaultManager] removeItemAtURL:[NSURL fileURLWithPath:historyFilePath] error:nil];
+
+    NSError *writeError = nil;
+    BOOL writeSuccess = [self.recentListArray writeToURL:[NSURL fileURLWithPath:historyFilePath] error:&writeError];
+
+    if (!writeSuccess || writeError) {
+        NSLog(@"writeToURL Fail:%@", writeError);
+    }
+
     // TODO: .Trash 路径排除
     self.hintLabel.hidden = YES;
 
@@ -382,19 +403,19 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
         // #endif
         [self->_recentListArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
              NSString *workPath = obj.stringByDeletingLastPathComponent;
-             NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:[NSURL fileURLWithPath:obj.stringByDeletingPathExtension] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
+             NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:[NSURL fileURLWithPath:workPath] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
              NSURL *appiconset = nil;
              for (NSURL *fileUrl in enumerator) {
-                 // NSLog(@"%@", fileUrl);todo:增加深度限制，max-depth
-                 NSString *aItem = [fileUrl lastPathComponent];
                  // appiconset
-                 if ([@"appiconset" isEqualToString:aItem.pathExtension]) {
+                 if ([@"appiconset" isEqualToString:fileUrl.pathExtension]) {
                      appiconset = fileUrl;
                      break;
                  }
              }
              if (appiconset) {
-                 NSDirectoryEnumerator *enumeratorIcon = [fileManager enumeratorAtURL:appiconset includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
+                 NSDirectoryEnumerator *enumeratorIcon = [fileManager enumeratorAtURL:appiconset 
+                                                           includingPropertiesForKeys:nil
+                                                                              options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
                  for (NSURL *fileUrl in enumeratorIcon) {
                      UIImage *image = [UIImage imageWithContentsOfFile:fileUrl.path];
                      if (image.size.width >= 60 && image.size.width <= 1200) {
@@ -424,22 +445,6 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
              } else {
                  NSLog(@".git folder not found within the specified depth limit.");
              }
-
-             //            SEL selector = NSSelectorFromString(@"runShell:workingDirectory:");
-             //            NSDictionary *result = [principalClass performSelector:selector withObject:@[@"git", @"-C", workPath, @"branch", @"-a"] withObject:workingDir];
-             //            NSLog(@"dacaiguoguogit:%@ %@", workPath, result);
-             //            NSNumber *code = result[@"code"];
-             //            if (code.intValue == 0) { /// code == 0 命令执行成功
-             //                NSString *output = result[@"output"];
-             //                NSArray *resultArray = [output componentsSeparatedByString:@"\n"];
-             //                for (NSString *item in resultArray) {
-             //                    if ([item hasPrefix:@"*"]) {
-             //                        NSLog(@"%@ %@", code, item);
-             //                        branchInfo[obj] = [item substringFromIndex:1];
-             //                        break;
-             //                    }
-             //                }
-             //            }
          }];
         self.branchInfo = branchInfo;
         self.iconInfo = iconInfo;
@@ -522,13 +527,19 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     static NSString *identifier = @"ProjectViewCell";
     ProjectViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
     NSString *orgPath = self.recentListArray[indexPath.row];
-//    NSString *path = [orgPath stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
-
-    cell.pathLabel.text = orgPath;
+    NSString *path = [orgPath stringByReplacingOccurrencesOfString:[homePath stringByAppendingString:@"/"] withString:@""];
+    cell.pathLabel.text = path;
     cell.path = orgPath;
     NSString *branchName = self.branchInfo[orgPath];
     cell.branchLabel.text = branchName;
-    cell.iconImageView.image = self.iconInfo[orgPath] ?: [UIImage imageNamed : @"XcodeIcon"];
+    UIImage *iconinf = self.iconInfo[orgPath];
+    if (iconinf) {
+        cell.iconImageView.image = iconinf;
+    } else if ([orgPath.pathExtension isEqualToString:@"plist"]) {
+        cell.iconImageView.image = [UIImage imageNamed:@"plisticon"];
+    } else {
+        cell.iconImageView.image = [UIImage imageNamed:@"XcodeIcon"];
+    }
     cell.iconImageView.layer.cornerRadius = 8;
     return cell;
 }
