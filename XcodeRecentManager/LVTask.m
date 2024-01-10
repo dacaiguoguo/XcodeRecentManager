@@ -8,6 +8,8 @@
 // https://www.appcoda.com/mac-app-sandbox/
 #import "LVTask.h"
 #import <AppKit/AppKit.h>
+
+
 @implementation LVTask {
 
 }
@@ -51,7 +53,7 @@
 
 + (NSURL *)selectFolderBtnClicked:(NSString *)documentPath {
     NSOpenPanel *folderSelectionDialog = [NSOpenPanel openPanel];  // a modal dialog
-
+    [self callMethodInCatalystApp];
     [folderSelectionDialog setPrompt:@"Select"];
     [folderSelectionDialog setMessage:@"Please select a folder"];
 
@@ -103,5 +105,24 @@
     return nil;
 } /* selectFolderBtnClicked */
 
++ (void)callMethodInCatalystApp {
+    // 获取 Catalyst App 的主要类
+    Class catalystAppClass = NSClassFromString(@"ViewController");
+    if (catalystAppClass) {
+        // 创建 Catalyst App 类的实例
+        id catalystAppInstance = [catalystAppClass new];
+
+        // 调用方法并获取返回值
+        SEL selector = NSSelectorFromString(@"resolveBookmarkDataOfKey:");
+        if ([catalystAppInstance respondsToSelector:selector]) {
+            NSString *result = [catalystAppInstance performSelector:selector withObject:@"hhh"];
+            NSLog(@"Result from Catalyst App: %@", result);
+        } else {
+            NSLog(@"Catalyst App method not found.");
+        }
+    } else {
+        NSLog(@"Catalyst App class not found.");
+    }
+}
 
 @end

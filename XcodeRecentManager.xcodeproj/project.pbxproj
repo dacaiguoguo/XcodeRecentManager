@@ -106,7 +106,6 @@
 			children = (
 				9D0A61E526B143B80069D967 /* XcodeRecentManager */,
 				9D0A61E426B143B80069D967 /* Products */,
-				9D7F18C226B1880900F3A4B1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,13 +145,6 @@
 				9D0A61F826B143BB0069D967 /* main.m */,
 			);
 			path = XcodeRecentManager;
-			sourceTree = "<group>";
-		};
-		9D7F18C226B1880900F3A4B1 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
