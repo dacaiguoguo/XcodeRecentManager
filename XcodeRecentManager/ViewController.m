@@ -248,7 +248,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     [self.view addConstraints:@[centerXConstraint, centerYConstraint, widthConstraint, heightConstraint]];
     
     [self loadData];
-
+    [self callMethodInCatalystApp];
 
 } /* viewDidLoad */
 
@@ -277,6 +277,10 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
 - (void)refreshAction:(id)sender {
     [self loadData];
     [self.tableView reloadData];
+}
+
++ (void)refreshAction22:(id)sender {
+  
 }
 
 
@@ -472,6 +476,23 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
         [self loadData];
     }
 }
+
+- (void)callMethodInCatalystApp {
+    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
+    NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
+
+    [bundle load];
+
+    // Load the principal class from the bundle
+    // This is set in MacTask/Info.plist
+    Class principalClass = bundle.principalClass;
+    SEL selector = NSSelectorFromString(@"callMethodInCatalystApp:");
+    NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
+    NSString *documentPath = [self filePathForDocumentPath:docURL.path];
+    [principalClass performSelector:selector withObject:@[documentPath]];
+    NSLog(@"%@", @"");
+}
+
 
 - (void)showApplicationRecentDocuments:(id)sender {
     NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;

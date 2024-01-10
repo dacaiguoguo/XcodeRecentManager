@@ -10,6 +10,8 @@
 		5B16F0BD2B35283E00BA6F21 /* SwiftTool.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = 5B16F0B42B3527A200BA6F21 /* SwiftTool.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5B16F0C42B352ACD00BA6F21 /* LVTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B16F0C32B352ACD00BA6F21 /* LVTask.m */; };
 		5B2BD9AD2B43E3E9002BE999 /* JsonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B2BD9AC2B43E3E9002BE999 /* JsonViewController.m */; };
+		5B47381E2B4E379800E63AEF /* SCEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B47381B2B4E379800E63AEF /* SCEvents.m */; };
+		5B47381F2B4E379800E63AEF /* SCEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B47381C2B4E379800E63AEF /* SCEvent.m */; };
 		9D0A61E826B143B80069D967 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61E726B143B80069D967 /* AppDelegate.m */; };
 		9D0A61EB26B143B80069D967 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61EA26B143B80069D967 /* SceneDelegate.m */; };
 		9D0A61EE26B143B80069D967 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A61ED26B143B80069D967 /* ViewController.m */; };
@@ -33,6 +35,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		5B4738172B4E376700E63AEF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9D7F18B326B183B200F3A4B1 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -63,6 +75,12 @@
 		5B2BD9872B43A39D002BE999 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		5B2BD9AB2B43E3E9002BE999 /* JsonViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JsonViewController.h; sourceTree = "<group>"; };
 		5B2BD9AC2B43E3E9002BE999 /* JsonViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JsonViewController.m; sourceTree = "<group>"; };
+		5B4738182B4E379800E63AEF /* SCEventListenerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCEventListenerProtocol.h; sourceTree = "<group>"; };
+		5B4738192B4E379800E63AEF /* SCEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCEvents.h; sourceTree = "<group>"; };
+		5B47381A2B4E379800E63AEF /* SCEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCEvent.h; sourceTree = "<group>"; };
+		5B47381B2B4E379800E63AEF /* SCEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCEvents.m; sourceTree = "<group>"; };
+		5B47381C2B4E379800E63AEF /* SCEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCEvent.m; sourceTree = "<group>"; };
+		5B47381D2B4E379800E63AEF /* SCConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCConstants.h; sourceTree = "<group>"; };
 		9D0A61E326B143B80069D967 /* XcodeRecentManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XcodeRecentManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0A61E626B143B80069D967 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9D0A61E726B143B80069D967 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -132,6 +150,12 @@
 				5B2BD9AC2B43E3E9002BE999 /* JsonViewController.m */,
 				9DCE529F27A2C37C00D39B77 /* ProjectViewCell.h */,
 				9DCE52A027A2C37C00D39B77 /* ProjectViewCell.m */,
+				5B47381D2B4E379800E63AEF /* SCConstants.h */,
+				5B47381A2B4E379800E63AEF /* SCEvent.h */,
+				5B47381C2B4E379800E63AEF /* SCEvent.m */,
+				5B4738182B4E379800E63AEF /* SCEventListenerProtocol.h */,
+				5B4738192B4E379800E63AEF /* SCEvents.h */,
+				5B47381B2B4E379800E63AEF /* SCEvents.m */,
 				9DCE52A127A2C37C00D39B77 /* ProjectViewCell.xib */,
 				9D15C89D26CCABDC003154B6 /* SFLListItem.h */,
 				9D15C89C26CCABDC003154B6 /* SFLListItem.m */,
@@ -157,6 +181,7 @@
 				5B16F0B02B3527A200BA6F21 /* Sources */,
 				5B16F0B12B3527A200BA6F21 /* Frameworks */,
 				5B16F0B22B3527A200BA6F21 /* Resources */,
+				5B4738172B4E376700E63AEF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -250,6 +275,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B47381E2B4E379800E63AEF /* SCEvents.m in Sources */,
+				5B47381F2B4E379800E63AEF /* SCEvent.m in Sources */,
 				5B16F0C42B352ACD00BA6F21 /* LVTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,6 +335,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AJG2826637;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/XcodeRecentManager",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -337,6 +368,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AJG2826637;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/XcodeRecentManager",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
