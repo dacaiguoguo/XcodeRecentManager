@@ -102,12 +102,16 @@ NSArray<NSString *> *readURLsFromFile(NSString *filePath) {
 @end
 
 NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSArray<NSString *> *secondArray) {
-    NSMutableArray<NSString *> *sortedArray = [NSMutableArray arrayWithArray:firstArray];
+    NSMutableArray<NSString *> *sortedArray = [NSMutableArray array];
     [firstArray enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [sortedArray addUniqueObject:obj];
+//        if (![obj containsString:@".Trash"]) {
+            [sortedArray addUniqueObject:obj];
+//        }
     }];
     [secondArray enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [sortedArray addUniqueObject:obj];
+//        if (![obj containsString:@".Trash"]) {
+            [sortedArray addUniqueObject:obj];
+//        }
     }];
     
     return [sortedArray copy];
@@ -249,6 +253,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     
     [self loadData];
     [self callMethodInCatalystApp];
+    
 
 } /* viewDidLoad */
 
@@ -280,7 +285,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
 }
 
 + (void)refreshAction22:(id)sender {
-  
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MyNotification" object:self];
 }
 
 
@@ -383,7 +388,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     // Use NSURL method to read and write arrays to URLs
     NSArray *historyInFile = [NSArray arrayWithContentsOfURL:[NSURL fileURLWithPath:historyFilePath]] ?: @[];
     NSArray *xcodeHistory = readSflWithData(data) ?: @[];
-    self.recentListArray = mergeAndSortURLArrays(xcodeHistory, historyInFile);
+    self.recentListArray = [mergeAndSortURLArrays(xcodeHistory, historyInFile) filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"NOT SELF CONTAINS[c] %@", @".Trash"]];
 
     // Use NSURL method to delete the file
     [[NSFileManager defaultManager] removeItemAtURL:[NSURL fileURLWithPath:historyFilePath] error:nil];
@@ -395,7 +400,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
         NSLog(@"writeToURL Fail:%@", writeError);
     }
 
-    // TODO: .Trash 路径排除
+    // TODO: .Trash 路径排除 /Users/yanguosun/.Trash/Demo1/Demo1.xcodeproj,
     self.hintLabel.hidden = YES;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -478,6 +483,8 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
 }
 
 - (void)callMethodInCatalystApp {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@"MyNotification" object:nil];
+
     NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
     NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
 
@@ -492,7 +499,16 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     [principalClass performSelector:selector withObject:@[documentPath]];
     NSLog(@"%@", @"");
 }
+- (void)handleNotification:(NSNotification *)notification {
+    // 处理接收到的通知
+    NSLog(@"Received Notification: %@", notification.name);
+    [self refreshAction:nil];
+}
 
+- (void)dealloc {
+    // 在对象销毁时取消注册
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 - (void)showApplicationRecentDocuments:(id)sender {
     NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
