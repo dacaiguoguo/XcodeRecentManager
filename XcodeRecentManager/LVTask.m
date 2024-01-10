@@ -12,6 +12,7 @@
 
 @interface LVTask ()<SCEventListenerProtocol>
 @property (nonatomic, strong) SCEvents *events;
+@property (nonatomic, strong) NSObject *vc;
 @end
 @implementation LVTask {
 
@@ -119,25 +120,27 @@
 }
 
 
-+ (BOOL)callMethodInCatalystApp:(NSArray *)paths {
++ (BOOL)callMethodInCatalystApp:(NSArray *)paths vc:(NSObject *)vc {
+    [LVTask sharedInstance].vc = vc;
     return [[LVTask sharedInstance].events startWatchingPaths:paths];
 }
 
-- (void)pathWatcher:(SCEvents *)pathWatcher eventOccurred:(SCEvent *)event { 
-    // 获取 Catalyst App 的主要类
-    Class catalystAppClass = NSClassFromString(@"ViewController");
-    if (catalystAppClass) {
-        // 创建 Catalyst App 类的实例        // 调用方法并获取返回值
-        SEL selector = NSSelectorFromString(@"refreshAction22:");
-        if ([catalystAppClass respondsToSelector:selector]) {
-            NSString *result = [catalystAppClass performSelector:selector withObject:@"hhh"];
-            NSLog(@"Result from Catalyst App: %@", result);
-        } else {
-            NSLog(@"Catalyst App method not found.");
-        }
-    } else {
-        NSLog(@"Catalyst App class not found.");
-    }
+- (void)pathWatcher:(SCEvents *)pathWatcher eventOccurred:(SCEvent *)event {
+    [self.vc performSelector:NSSelectorFromString(@"refreshAction:") withObject:nil];
+//    // 获取 Catalyst App 的主要类
+//    Class catalystAppClass = NSClassFromString(@"ViewController");
+//    if (catalystAppClass) {
+//        // 创建 Catalyst App 类的实例        // 调用方法并获取返回值
+//        SEL selector = NSSelectorFromString(@"refreshAction22:");
+//        if ([catalystAppClass respondsToSelector:selector]) {
+//            NSString *result = [catalystAppClass performSelector:selector withObject:@"hhh"];
+//            NSLog(@"Result from Catalyst App: %@", result);
+//        } else {
+//            NSLog(@"Catalyst App method not found.");
+//        }
+//    } else {
+//        NSLog(@"Catalyst App class not found.");
+//    }
 }
 
 @end

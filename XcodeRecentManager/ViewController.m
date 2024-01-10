@@ -129,6 +129,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
 @property (nonatomic, copy) NSDictionary *iconInfo;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) UITextView *hintLabel;
+
 @end
 
 
@@ -252,7 +253,6 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     [self.view addConstraints:@[centerXConstraint, centerYConstraint, widthConstraint, heightConstraint]];
     
     [self loadData];
-    [self callMethodInCatalystApp];
     
 
 } /* viewDidLoad */
@@ -283,11 +283,6 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     [self loadData];
     [self.tableView reloadData];
 }
-
-+ (void)refreshAction22:(id)sender {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MyNotification" object:self];
-}
-
 
 - (void)loadData {
     NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
@@ -320,6 +315,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
         [self handleFileNotFound];
         return;
     }
+    [self callMethodInCatalystApp];
 
     [self runWithFilePath:filePath];
 }
@@ -493,10 +489,10 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
     // Load the principal class from the bundle
     // This is set in MacTask/Info.plist
     Class principalClass = bundle.principalClass;
-    SEL selector = NSSelectorFromString(@"callMethodInCatalystApp:");
+    SEL selector = NSSelectorFromString(@"callMethodInCatalystApp:vc:");
     NSURL *docURL = [self resolveBookmarkDataOfKey:kApplicationRecentDocumentsKey];
     NSString *documentPath = [self filePathForDocumentPath:docURL.path];
-    [principalClass performSelector:selector withObject:@[documentPath]];
+    [principalClass performSelector:selector withObject:@[documentPath] withObject:self];
     NSLog(@"%@", @"");
 }
 - (void)handleNotification:(NSNotification *)notification {
