@@ -398,7 +398,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
 
     // TODO: .Trash 路径排除 /Users/yanguosun/.Trash/Demo1/Demo1.xcodeproj,
     self.hintLabel.hidden = YES;
-
+    NSArray *recentListArraySafe = self.recentListArray;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // #if TARGET_OS_MACCATALYST
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -406,7 +406,7 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
         NSMutableDictionary *iconInfo = [NSMutableDictionary dictionary];
 
         // #endif
-        [self->_recentListArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [recentListArraySafe enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
              NSString *workPath = obj.stringByDeletingLastPathComponent;
              NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:[NSURL fileURLWithPath:workPath] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:nil];
              NSURL *appiconset = nil;
@@ -581,6 +581,9 @@ NSArray<NSString *> *mergeAndSortURLArrays(NSArray<NSString *> *firstArray, NSAr
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *orgPath = self.recentListArray[indexPath.row];
     NSURL *xcodeURL = [NSURL fileURLWithPath:orgPath];
+    if (![orgPath.lastPathComponent containsString:@"."]) {
+        xcodeURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Package.swift", orgPath]];
+    }
 //    NSString *pluginPath = [[NSBundle.mainBundle builtInPlugInsURL] URLByAppendingPathComponent:@"SwiftTool.bundle"].path;
 //    NSBundle *bundle = [NSBundle bundleWithPath:pluginPath];
 //
